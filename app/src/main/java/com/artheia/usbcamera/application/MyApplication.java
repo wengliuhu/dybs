@@ -1,9 +1,8 @@
-package com.jiangdg.usbcamera.application;
+package com.artheia.usbcamera.application;
 
 import android.app.Application;
 
-import com.jiangdg.usbcamera.UVCCameraHelper;
-import com.jiangdg.usbcamera.utils.CrashHandler;
+import com.artheia.usbcamera.utils.CrashHandler;
 
 /**application class
  *

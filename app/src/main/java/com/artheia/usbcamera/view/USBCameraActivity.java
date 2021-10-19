@@ -1,7 +1,6 @@
-package com.jiangdg.usbcamera.view;
+package com.artheia.usbcamera.view;
 
 import android.hardware.usb.UsbDevice;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,15 +18,15 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.Toast;
-import com.jiangdg.usbcamera.R;
+import com.artheia.usbcamera.R;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.jiangdg.usbcamera.UVCCameraHelper;
-import com.jiangdg.usbcamera.application.MyApplication;
-import com.jiangdg.usbcamera.utils.FileUtils;
+import com.artheia.usbcamera.UVCCameraHelper;
+import com.artheia.usbcamera.application.MyApplication;
+import com.artheia.usbcamera.utils.FileUtils;
 import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.Size;
 import com.serenegiant.usb.USBMonitor;
@@ -35,7 +34,6 @@ import com.serenegiant.usb.common.AbstractUVCCameraHandler;
 import com.serenegiant.usb.encoder.RecordParams;
 import com.serenegiant.usb.widget.CameraViewInterface;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

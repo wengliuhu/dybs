@@ -1,16 +1,15 @@
-package com.jiangdg.usbcamera.utils;
+package com.artheia.usbcamera.utils;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Looper;
 import android.widget.Toast;
 
-import com.jiangdg.usbcamera.UVCCameraHelper;
-import com.jiangdg.usbcamera.application.MyApplication;
+import com.artheia.usbcamera.UVCCameraHelper;
+import com.artheia.usbcamera.application.MyApplication;
 
 import java.io.File;
 import java.io.FileNotFoundException;

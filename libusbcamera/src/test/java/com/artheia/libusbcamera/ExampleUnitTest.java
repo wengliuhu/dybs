@@ -1,4 +1,4 @@
-package com.jiangdg.usbcamera;
+package com.artheia.libusbcamera;
 
 import org.junit.Test;
 

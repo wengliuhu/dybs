@@ -1,8 +1,8 @@
-package com.jiangdg.usbcamera;
+package com.artheia.libusbcamera;
 
 import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.jiangdg.androidusbcamera", appContext.getPackageName());
+        assertEquals("com.jiangdg.libusbcamera.test", appContext.getPackageName());
     }
 }
