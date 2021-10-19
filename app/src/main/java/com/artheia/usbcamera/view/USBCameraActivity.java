@@ -1,5 +1,6 @@
 package com.artheia.usbcamera.view;
 
+import android.graphics.Matrix;
 import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,13 +27,17 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.artheia.usbcamera.UVCCameraHelper;
 import com.artheia.usbcamera.application.MyApplication;
+import com.artheia.usbcamera.bean.ConfigBean;
 import com.artheia.usbcamera.utils.FileUtils;
+import com.artheia.usbcamera.utils.Utils;
+import com.artheia.usbcamera.view.widget.AutoScanView;
 import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.Size;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.common.AbstractUVCCameraHandler;
 import com.serenegiant.usb.encoder.RecordParams;
 import com.serenegiant.usb.widget.CameraViewInterface;
+import com.serenegiant.usb.widget.UVCCameraTextureView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,10 +63,15 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     public SeekBar mSeekContrast;
     @BindView(R.id.switch_rec_voice)
     public Switch mSwitchVoice;
+    @BindView(R.id.asv)
+    AutoScanView mAutoScanView;
 
     private UVCCameraHelper mCameraHelper;
-    private CameraViewInterface mUVCCameraView;
+    private UVCCameraTextureView mUVCCameraView;
     private AlertDialog mDialog;
+    // 控制视频流的变换
+    private Matrix mMatrix;
+    private int mCenterX,mCenterY;
 
     private boolean isRequest;
     private boolean isPreview;
@@ -111,6 +121,16 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                         if(mCameraHelper != null && mCameraHelper.isCameraOpened()) {
                             mSeekBrightness.setProgress(mCameraHelper.getModelValue(UVCCameraHelper.MODE_BRIGHTNESS));
                             mSeekContrast.setProgress(mCameraHelper.getModelValue(UVCCameraHelper.MODE_CONTRAST));
+                            //2021.10.19 14：30添加
+                            mMatrix = new Matrix(mUVCCameraView.getMatrix());
+                            int scale = ConfigBean.getInstance().getScale();
+                            mMatrix.setScale(scale + 1 , scale + 1, mCenterX, mCenterY);
+                            mCenterX = (mUVCCameraView.getRight() + mUVCCameraView.getLeft()) / 2;
+                            mCenterY = (mUVCCameraView.getBottom() + mUVCCameraView.getTop()) /2;
+                            int boxWidth =  Utils.dp2px(USBCameraActivity.this, scale + 40);
+                            // 红色矩形的宽度
+                            float width = (mUVCCameraView.getHeight() - boxWidth) * (1.0f * scale / 23) + boxWidth;
+                            mAutoScanView.freash(mCenterX - width / 2, mCenterY - width / 2, mCenterX + width / 2, mCenterY + width / 2);
                         }
                         Looper.loop();
                     }
@@ -132,7 +152,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         initView();
 
         // step.1 initialize UVCCameraHelper
-        mUVCCameraView = (CameraViewInterface) mTextureView;
+        mUVCCameraView = (UVCCameraTextureView) mTextureView;
         mUVCCameraView.setCallback(this);
         mCameraHelper = UVCCameraHelper.getInstance();
         mCameraHelper.setDefaultFrameFormat(UVCCameraHelper.FRAME_FORMAT_MJPEG);

@@ -3,6 +3,7 @@ package com.artheia.usbcamera.application;
 import android.app.Application;
 
 import com.artheia.usbcamera.utils.CrashHandler;
+import com.artheia.usbcamera.utils.TtsSpeaker;
 
 /**application class
  *
@@ -10,6 +11,7 @@ import com.artheia.usbcamera.utils.CrashHandler;
  */
 
 public class MyApplication extends Application {
+    public static MyApplication mInstance;
     private CrashHandler mCrashHandler;
     // File Directory in sd card
     public static final String DIRECTORY_NAME = "USBCamera";
@@ -19,5 +21,12 @@ public class MyApplication extends Application {
         super.onCreate();
         mCrashHandler = CrashHandler.getInstance();
         mCrashHandler.init(getApplicationContext(), getClass());
+        mInstance = this;
+        TtsSpeaker.getInstance().init(this);
     }
+
+    public static MyApplication getAPP(){
+        return mInstance;
+    }
+
 }
