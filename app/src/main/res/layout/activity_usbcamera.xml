@@ -104,4 +104,26 @@
         android:text="closeVoice"
         android:textColor="@color/colorWhite" />
 
+    <com.artheia.usbcamera.view.widget.LightScaleView
+        android:id="@+id/light_scale"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/iv_setting"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="45dp"
+        android:src="@mipmap/ic_setting2" />
+
+    <TextView
+        android:id="@+id/tv_fps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#f00"
+        android:textSize="18sp"
+        android:text="FPS:"/>
+
 </RelativeLayout>

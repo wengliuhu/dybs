@@ -26,6 +26,7 @@ package com.serenegiant.usb.widget;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -34,6 +35,8 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
 
+import com.artheia.usbcamera.application.MyApplication;
+import com.artheia.usbcamera.utils.ShaderUtils;
 import com.serenegiant.glutils.EGLBase;
 import com.serenegiant.glutils.GLDrawer2D;
 import com.serenegiant.glutils.es1.GLHelper;
@@ -250,6 +253,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 		private static final int MSG_CREATE_SURFACE = 3;
 		private static final int MSG_RESIZE = 4;
 		private static final int MSG_TERMINATE = 9;
+		private static final int MSG_UPDATE_SHADER = 10;
 
 		private RenderThread mThread;
 		private boolean mIsActive = true;
@@ -303,6 +307,20 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 			}
 		}
 
+		public void updateShader(String vs, String fs) {
+			if (DEBUG) Log.v(TAG, "updateShader:");
+			if (mIsActive) {
+				synchronized (mThread.mSync) {
+					Message message = obtainMessage(MSG_UPDATE_SHADER);
+					Bundle bundle = new Bundle();
+					bundle.putString("vs", vs);
+					bundle.putString("fs", fs);
+					message.setData(bundle);
+					sendMessage(message);
+				}
+			}
+		}
+
 		public final void release() {
 			if (DEBUG) Log.v(TAG, "release:");
 			if (mIsActive) {
@@ -341,6 +359,12 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 				Looper.myLooper().quit();
 				mThread = null;
 				break;
+				case MSG_UPDATE_SHADER: {
+					String vsStr = msg.getData().getString("vs");
+					String fsStr = msg.getData().getString("fs");
+					mThread.updateShader(vsStr, fsStr);
+					break;
+				}
 			default:
 				super.handleMessage(msg);
 			}
@@ -540,6 +564,10 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 				return bitmap;
 			} */
 
+			public void updateShader(String vsStr, String fsStr){
+				mDrawer.updateShader(vsStr, fsStr);
+			}
+
 			@Override
 			public final void run() {
 				Log.d(TAG, getName() + " started");
@@ -594,5 +622,16 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	    		}
 	    	}
 		}
+	}
+
+	/**
+	 * 灰度显示
+	 * @param gray
+	 */
+	public void changeGray(boolean gray){
+		String fsStr = ShaderUtils.loadFromAssetsFile(gray ? "filter/gray_fragment.sh" : "filter/default_fragment.sh", MyApplication.mInstance.getResources());
+		String vsStr = ShaderUtils.loadFromAssetsFile("filter/gray_vertex.sh", MyApplication.mInstance.getResources());
+		mRenderHandler.updateShader(vsStr, fsStr);
+//		mRenderHandler.mThread.mFragmentPath = gray ? "filter/gray_fragment.sh" : "filter/default_fragment.sh";
 	}
 }
