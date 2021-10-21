@@ -105,6 +105,9 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                         mTvFps.removeCallbacks(mFpsTask);
                         mTvFps.setVisibility(View.GONE);
                         mAutoScanView.setVisibility(View.GONE);
+                        if (mSettingDialog != null) {
+                            mSettingDialog.dismiss();
+                        }
                     }
                 });
             }
@@ -162,6 +165,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_usbcamera);
         ButterKnife.bind(this);
