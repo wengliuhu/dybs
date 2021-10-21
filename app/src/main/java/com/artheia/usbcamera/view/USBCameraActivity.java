@@ -4,25 +4,19 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
-
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SeekBar;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.artheia.usbcamera.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,8 +24,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.artheia.usbcamera.R;
 import com.artheia.usbcamera.UVCCameraHelper;
-import com.artheia.usbcamera.application.MyApplication;
 import com.artheia.usbcamera.bean.ConfigBean;
 import com.artheia.usbcamera.utils.FileUtils;
 import com.artheia.usbcamera.utils.TtsSpeaker;
@@ -44,7 +38,6 @@ import com.serenegiant.usb.Size;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.usb.common.AbstractUVCCameraHandler;
-import com.serenegiant.usb.encoder.RecordParams;
 import com.serenegiant.usb.widget.CameraViewInterface;
 import com.serenegiant.usb.widget.UVCCameraTextureView;
 
@@ -106,6 +99,14 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                 isRequest = false;
                 mCameraHelper.closeCamera();
                 showShortMsg(device.getDeviceName() + " is out");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTvFps.removeCallbacks(mFpsTask);
+                        mTvFps.setVisibility(View.GONE);
+                        mAutoScanView.setVisibility(View.GONE);
+                    }
+                });
             }
         }
 
@@ -133,6 +134,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                             //2021.10.19 14：30添加
                             mMatrix = new Matrix(mUVCCameraView.getMatrix());
                             int scale = ConfigBean.getInstance().getScale();
+                            int light = ConfigBean.getInstance().getBrightness();
                             mMatrix.setScale(scale, scale, mCenterX, mCenterY);
                             mCenterX = (mUVCCameraView.getRight() + mUVCCameraView.getLeft()) / 2;
                             mCenterY = (mUVCCameraView.getBottom() + mUVCCameraView.getTop()) /2;
@@ -140,6 +142,11 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                             // 红色矩形的宽度
                             float width = (mUVCCameraView.getHeight() - boxWidth) * (1.0f * scale / 23) + boxWidth;
                             mAutoScanView.freash(mCenterX - width / 2, mCenterY - width / 2, mCenterX + width / 2, mCenterY + width / 2);
+                            //获取存储的值给手势view
+                            if (mLightScaleView != null) {
+                                mLightScaleView.setCurrentLight(light);
+                                mLightScaleView.setCurrentScale(scale);
+                            }
                         }
                         Looper.loop();
                     }
@@ -490,7 +497,12 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                 srcFps = 0.0f;
             }
             String reslut = String.format(Locale.US, "FPS:%4.1f", srcFps);
-            Log.d("kim", reslut);
+            if (mTvFps.getVisibility() == View.GONE) {
+                mTvFps.setVisibility(View.VISIBLE);
+            }
+            if (mAutoScanView.getVisibility() == View.GONE) {
+                mAutoScanView.setVisibility(View.VISIBLE);
+            }
             mTvFps.setText(reslut);
             mTvFps.postDelayed(this, 1000);
         }
