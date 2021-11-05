@@ -252,6 +252,10 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(USBCameraActivity.this);
         View rootView = LayoutInflater.from(USBCameraActivity.this).inflate(R.layout.layout_dialog_list, null);
         ListView listView = (ListView) rootView.findViewById(R.id.listview_dialog);
+        List<String> resolutionList = getResolutionList();
+        if (resolutionList == null) {
+            return;
+        }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(USBCameraActivity.this, android.R.layout.simple_list_item_1, getResolutionList()){
             @NonNull
             @Override

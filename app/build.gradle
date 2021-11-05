@@ -9,6 +9,10 @@ android {
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionNameString
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips", "arm64-v8a", "x86_64"
+        }
     }
     buildTypes {
         release {
@@ -25,7 +29,13 @@ android {
     sourceSets {
         main {
             jni.srcDirs = []
-            jniLibs.srcDirs = ['src/main/jniLibs']
+            jniLibs.srcDirs = ['src/main/libs']
+        }
+    }
+
+    externalNativeBuild {
+        ndkBuild {
+//            path file('src/main/jni/Android.mk')
         }
     }
 
