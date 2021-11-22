@@ -87,7 +87,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
             if (!isRequest) {
                 isRequest = true;
                 if (mCameraHelper != null) {
-                    mCameraHelper.requestPermission(0);
+                    mCameraHelper.requestPermission();
                 }
             }
         }

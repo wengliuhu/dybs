@@ -2,7 +2,10 @@ package com.artheia.usbcamera;
 
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
+import android.hardware.usb.UsbConfiguration;
+import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbInterface;
 import android.os.Environment;
 
 import com.artheia.org.easydarwin.sw.TxtOverlay;
@@ -17,8 +20,11 @@ import com.serenegiant.usb.widget.CameraViewInterface;
 
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /** UVCCamera Helper class
  *
@@ -215,17 +221,48 @@ public class UVCCameraHelper {
         return mCameraHandler != null ? mCameraHandler.resetValue(flag) : 0;
     }
 
-    public void requestPermission(int index) {
+    public void requestPermission() {
         List<UsbDevice> devList = getUsbDeviceList();
         if (devList == null || devList.size() == 0) {
             return;
         }
-        int count = devList.size();
-        if (index >= count)
-            new IllegalArgumentException("index illegal,should be < devList.size()");
-        if (mUSBMonitor != null) {
-            mUSBMonitor.requestPermission(getUsbDeviceList().get(index));
+        List<UsbDevice> usbDeviceList = getCameraDevice(devList);
+        if (usbDeviceList != null  && usbDeviceList.size() > 0) {
+            if (mUSBMonitor != null) {
+                mUSBMonitor.requestPermission(usbDeviceList.get(0));
+            }
         }
+    }
+
+    /**
+     * 获取 {@link UsbConstants}类型为USB_CLASS_VIDEO的摄像头设备
+     * @param devList xml读取出的设备
+     * @return
+     */
+    private List<UsbDevice> getCameraDevice(List<UsbDevice> devList) {
+        List<UsbDevice> classVideoDeviceList = new ArrayList<>();
+        Set<UsbDevice> singleList = new HashSet<>();
+        for (UsbDevice device : devList) {
+            int count = device.getConfigurationCount();
+            for (int i = 0; i < count; i++) {
+                UsbConfiguration configuration = device.getConfiguration(i);
+                if (null == configuration) {
+                    continue;
+                }
+                int interfaceCount = configuration.getInterfaceCount();
+                for (int j = 0; j < interfaceCount; j++) {
+                    UsbInterface usbInterface = configuration.getInterface(j);
+                    if (null != usbInterface && usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_VIDEO) {
+                        singleList.add(device);
+                    }
+                }
+            }
+        }
+        //转为list
+        for(UsbDevice usbDevice : singleList){
+            classVideoDeviceList.add(usbDevice);
+        }
+        return classVideoDeviceList;
     }
 
     public int getUsbDeviceCount() {
