@@ -49,6 +49,6 @@ dependencies {
     implementation 'com.jakewharton:butterknife:10.2.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
     api "com.serenegiant:common:${commonLibVersion}"
-
-//    implementation project(':libusbcamera')
+    implementation files('src\\main\\libs\\ocrsdk.aar')
+    //    implementation project(':libusbcamera')
 }

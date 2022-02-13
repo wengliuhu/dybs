@@ -18,6 +18,7 @@ public class FileUtils {
 //    public static String ROOT_PATH = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator;
     private final static String FEELFULL_PATH = "/Dybs/TestDevices/";
     private static final String ROOT_PATH = Environment.getExternalStorageDirectory().toString() + FEELFULL_PATH;
+    private final static String PATH_SAVE_IMG = "saveImage/";
     public static String getRootPath(){
         return ROOT_PATH;
     }
@@ -31,6 +32,10 @@ public class FileUtils {
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static String getSaveImagePath(){
+        return ROOT_PATH + PATH_SAVE_IMG;
     }
 
     public static void releaseFile(){

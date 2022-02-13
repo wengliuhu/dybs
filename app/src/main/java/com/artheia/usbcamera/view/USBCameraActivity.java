@@ -5,8 +5,12 @@ import android.graphics.Matrix;
 import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.os.Looper;
+import android.os.SystemClock;
+import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
@@ -224,6 +228,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                 TtsSpeaker.getInstance().addMessageFlush("[p1500]" + (showProcess > 0 ? "放大 " : "缩小") + Math.abs(showProcess) + "倍");
             }
         });
+
     }
 
     private void initView() {
@@ -248,6 +253,9 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         }
     }
 
+    /**
+     * 显示分辨率的弹框
+     */
     private void showResolutionListDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(USBCameraActivity.this);
         View rootView = LayoutInflater.from(USBCameraActivity.this).inflate(R.layout.layout_dialog_list, null);
@@ -321,6 +329,38 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
             }
         }
         return resolutions;
+    }
+
+    // 记录最后点击 的时间
+    long lastClickTime;
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        Log.d(TAG, "-----onTouchEvent----" + event.getAction());
+        if (event.getAction() == MotionEvent.ACTION_UP){
+            if (SystemClock.uptimeMillis() - lastClickTime < 1000){
+                Log.d(TAG, "-----onTouchEvent---capturePicture-");
+
+                String fileName = System.currentTimeMillis() + ".jpg";
+                // 开始截图
+                mCameraHelper.capturePicture(FileUtils.getSaveImagePath() + fileName, new AbstractUVCCameraHandler.OnCaptureListener() {
+                    @Override
+                    public void onCaptureResult(String picPath)
+                    {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run()
+                            {
+                                Toast.makeText(USBCameraActivity.this, "保存图片成功：" + picPath, Toast.LENGTH_LONG).show();
+                                // TODO: 2022/2/13 开始OCR识别
+                            }
+                        });
+                    }
+                });
+            }
+            lastClickTime = SystemClock.uptimeMillis();
+        }
+        return super.onTouchEvent(event);
     }
 
     @Override
