@@ -8,7 +8,7 @@ varying vec2 vTextureCo;
 
 vec4 valueAdd(vec2 pos,float shiftX,float shiftY,float p){
     vec2 newPos=vec2((pos.x+shiftX)/uWidth,(pos.y+shiftY)/uHeight);
-    return texture2D(uTexture,newPos)/p;
+    return texture2D(sTexture,newPos)/p;
 }
 
 void main(){

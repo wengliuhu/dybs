@@ -6,6 +6,7 @@ import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -31,12 +32,17 @@ import androidx.appcompat.widget.Toolbar;
 import com.artheia.usbcamera.R;
 import com.artheia.usbcamera.UVCCameraHelper;
 import com.artheia.usbcamera.bean.ConfigBean;
+import com.artheia.usbcamera.ocr.FileUtil;
+import com.artheia.usbcamera.ocr.OcrHelper;
+import com.artheia.usbcamera.ocr.OcrResult;
+import com.artheia.usbcamera.ocr.RecognizeService;
 import com.artheia.usbcamera.utils.FileUtils;
 import com.artheia.usbcamera.utils.TtsSpeaker;
 import com.artheia.usbcamera.utils.Utils;
 import com.artheia.usbcamera.view.widget.AppConstant;
 import com.artheia.usbcamera.view.widget.AutoScanView;
 import com.artheia.usbcamera.view.widget.LightScaleView;
+import com.google.gson.Gson;
 import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.Size;
 import com.serenegiant.usb.USBMonitor;
@@ -46,6 +52,7 @@ import com.serenegiant.usb.widget.CameraViewInterface;
 import com.serenegiant.usb.widget.UVCCameraTextureView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -154,6 +161,8 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                                 mLightScaleView.setCurrentLight(light);
                                 mLightScaleView.setCurrentScale(scale);
                             }
+                            // 自动聚焦
+                            mCameraHelper.startCameraFoucs();
                         }
                         Looper.loop();
                     }
@@ -186,7 +195,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         mCameraHelper.setOnPreviewFrameListener(new AbstractUVCCameraHandler.OnPreViewResultListener() {
             @Override
             public void onPreviewResult(byte[] nv21Yuv) {
-                Log.d(TAG, "onPreviewResult: "+nv21Yuv.length);
+//                Log.d(TAG, "onPreviewResult: "+nv21Yuv.length);
             }
         });
         findViewById(R.id.iv_setting).setOnClickListener(v-> {
@@ -229,6 +238,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
             }
         });
 
+        OcrHelper.getInstance().initAccessTokenWithAkSk(this);
     }
 
     private void initView() {
@@ -341,20 +351,71 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
             if (SystemClock.uptimeMillis() - lastClickTime < 1000){
                 Log.d(TAG, "-----onTouchEvent---capturePicture-");
 
-                String fileName = System.currentTimeMillis() + ".jpg";
+         /*       // TODO: 2022/2/15 测试OCR
+                String filePath = FileUtils.getSaveImagePath() + "a.jpg";
+                // TODO: 2022/2/13 开始OCR识别
+                RecognizeService.recognizeGeneralBasic(USBCameraActivity.this, filePath,
+                        new RecognizeService.ServiceListener() {
+                            @Override
+                            public void onResult(String result) {
+                                Log.d(TAG, result);
+//                                Toast.makeText(USBCameraActivity.this, "识别图片成功：" + result, Toast.LENGTH_LONG).show();
+                                Gson gson = new Gson();
+                                OcrResult ocrResult = gson.fromJson(result, OcrResult.class);
+                                if (ocrResult == null){
+                                    Toast.makeText(USBCameraActivity.this, "识别图片失败：" + result, Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                StringBuffer buffer = new StringBuffer();
+                                if (ocrResult.getWords_result() != null){
+                                    Iterator<OcrResult.WordsResult> iterator = ocrResult.getWords_result().iterator();
+                                    while (iterator.hasNext()){
+                                        buffer.append(iterator.next().getWords());
+                                    }
+                                }
+                                if (!TextUtils.isEmpty(buffer.toString())){
+                                    TtsSpeaker.getInstance().addMessageFlush(buffer.toString());
+                                }else {
+                                    Toast.makeText(USBCameraActivity.this, "未识别到文字!", Toast.LENGTH_LONG).show();
+                                }
+
+                            }
+                        });*/
                 // 开始截图
+                String fileName = System.currentTimeMillis() + ".jpg";
                 mCameraHelper.capturePicture(FileUtils.getSaveImagePath() + fileName, new AbstractUVCCameraHandler.OnCaptureListener() {
                     @Override
                     public void onCaptureResult(String picPath)
                     {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run()
-                            {
-                                Toast.makeText(USBCameraActivity.this, "保存图片成功：" + picPath, Toast.LENGTH_LONG).show();
-                                // TODO: 2022/2/13 开始OCR识别
-                            }
-                        });
+                        OcrHelper.getInstance().recognizeGeneralBasic(picPath);
+
+                        RecognizeService.recognizeGeneralBasic(USBCameraActivity.this, picPath,
+                                new RecognizeService.ServiceListener() {
+                                    @Override
+                                    public void onResult(String result) {
+                                        Log.d(TAG, result);
+//                                Toast.makeText(USBCameraActivity.this, "识别图片成功：" + result, Toast.LENGTH_LONG).show();
+                                        Gson gson = new Gson();
+                                        OcrResult ocrResult = gson.fromJson(result, OcrResult.class);
+                                        if (ocrResult == null){
+                                            Toast.makeText(USBCameraActivity.this, "识别图片失败：" + result, Toast.LENGTH_LONG).show();
+                                            return;
+                                        }
+                                        StringBuffer buffer = new StringBuffer();
+                                        if (ocrResult.getWords_result() != null){
+                                            Iterator<OcrResult.WordsResult> iterator = ocrResult.getWords_result().iterator();
+                                            while (iterator.hasNext()){
+                                                buffer.append(iterator.next().getWords());
+                                            }
+                                        }
+                                        if (!TextUtils.isEmpty(buffer.toString())){
+                                            TtsSpeaker.getInstance().addMessageFlush(buffer.toString());
+                                        }else {
+                                            Toast.makeText(USBCameraActivity.this, "未识别到文字!", Toast.LENGTH_LONG).show();
+                                        }
+
+                                    }
+                                });
                     }
                 });
             }

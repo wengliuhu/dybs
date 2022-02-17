@@ -38,17 +38,15 @@ import java.util.LinkedList;
 public abstract class BaseFilter implements Renderer
 {
 
-    public static final String BASE_VERT="attribute vec4 aVertexCo;\n" +
-            "attribute vec2 aTextureCo;\n" +
-            "\n" +
-            "uniform mat4 uVertexMatrix;\n" +
-            "uniform mat4 uTextureMatrix;\n" +
-            "\n" +
-            "varying vec2 vTextureCo;\n" +
-            "\n" +
-            "void main(){\n" +
-            "    gl_Position = uVertexMatrix*aVertexCo;\n" +
-            "    vTextureCo = (uTextureMatrix*vec4(aTextureCo,0,1)).xy;\n" +
+    public static final String BASE_VERT="#version 100\n" +
+            "uniform mat4 uMVPMatrix;\n" +
+            "uniform mat4 uTexMatrix;\n" +
+            "attribute highp vec4 aPosition;\n" +
+            "attribute highp vec4 aTextureCoord;\n" +
+            "varying highp vec2 vTextureCoord;\n" +
+            "void main() {\n" +
+            " gl_Position = uMVPMatrix * aPosition;\n" +
+            " vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
             "}";
 
     private float[] mVertexMatrix= MatrixUtils.getOriginalMatrix();
@@ -146,11 +144,11 @@ public abstract class BaseFilter implements Renderer
         }else{
             mGLProgram= GpuUtils.createGLProgram(mVertex,mFragment);
         }
-        mGLVertexCo= GLES20.glGetAttribLocation(mGLProgram,"aVertexCo");
-        mGLTextureCo=GLES20.glGetAttribLocation(mGLProgram,"aTextureCo");
-        mGLVertexMatrix=GLES20.glGetUniformLocation(mGLProgram,"uVertexMatrix");
-        mGLTextureMatrix=GLES20.glGetUniformLocation(mGLProgram,"uTextureMatrix");
-        mGLTexture=GLES20.glGetUniformLocation(mGLProgram,"uTexture");
+        mGLVertexCo= GLES20.glGetAttribLocation(mGLProgram,"aPosition");
+        mGLTextureCo=GLES20.glGetAttribLocation(mGLProgram,"aTextureCoord");
+        mGLVertexMatrix=GLES20.glGetUniformLocation(mGLProgram,"uMVPMatrix");
+        mGLTextureMatrix=GLES20.glGetUniformLocation(mGLProgram,"uTexMatrix");
+        mGLTexture=GLES20.glGetUniformLocation(mGLProgram,"sTexture");
 
         if(isUseSize){
             mGLWidth=GLES20.glGetUniformLocation(mGLProgram,"uWidth");

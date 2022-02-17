@@ -1,6 +1,6 @@
 precision highp float;
 precision highp int;
-uniform sampler2D uTexture;
+uniform sampler2D sTexture;
 uniform int uIternum;
 uniform float uACoef; //参数
 uniform float uMixCoef; //混合系数
@@ -19,19 +19,19 @@ void main() {
     float distanceFromCentralColor;
     float gaussianWeight;
 
-    central = texture2D( uTexture, vTextureCo ).g;
+    central = texture2D( sTexture, vTextureCo ).g;
     gaussianWeightTotal = 0.2;
     sum = central * 0.2;
 
     for (int i = 0; i < 6; i++) {
-        sampleColor = texture2D( uTexture, vBlurCoord1s[i] ).g;
+        sampleColor = texture2D( sTexture, vBlurCoord1s[i] ).g;
         distanceFromCentralColor = min( abs( central - sampleColor ) * distanceNormalizationFactor, 1.0 );
         gaussianWeight = 0.05 * (1.0 - distanceFromCentralColor);
         gaussianWeightTotal += gaussianWeight;
         sum += sampleColor * gaussianWeight;
     }
     for (int i = 6; i < 14; i++) {
-        sampleColor = texture2D( uTexture, vBlurCoord1s[i] ).g;
+        sampleColor = texture2D( sTexture, vBlurCoord1s[i] ).g;
         distanceFromCentralColor = min( abs( central - sampleColor ) * distanceNormalizationFactor, 1.0 );
         gaussianWeight = 0.1 * (1.0 - distanceFromCentralColor);
         gaussianWeightTotal += gaussianWeight;
@@ -39,7 +39,7 @@ void main() {
     }
 
     sum = sum / gaussianWeightTotal;
-    centralColor = texture2D( uTexture, vTextureCo ).rgb;
+    centralColor = texture2D( sTexture, vTextureCo ).rgb;
     sampleColor = centralColor.g - sum + 0.5;
     for (int i = 0; i < 100; i++) {
         if(i>=uIternum){

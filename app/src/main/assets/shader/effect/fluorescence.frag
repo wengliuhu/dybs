@@ -1,6 +1,6 @@
 precision highp float;
 
-uniform sampler2D uTexture;
+uniform sampler2D sTexture;
 uniform sampler2D uTexture2;
 uniform float uWidth;
 uniform float uHeight;
@@ -10,7 +10,7 @@ uniform vec4 uBorderColor;
 uniform float uStep;
 
 void main(){
-    vec4 baseColor=texture2D(uTexture,vTextureCo);
-    float sobelColor=texture2D(uTexture2,vTextureCo).r;
+    vec4 baseColor=texture2D(sTexture,vTextureCo);
+    float sobelColor=texture2D(sTexture2,vTextureCo).r;
     gl_FragColor=(1.-sobelColor*uStep)*baseColor+sobelColor*uBorderColor*uStep;
 }

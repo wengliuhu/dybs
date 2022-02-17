@@ -3,6 +3,8 @@ package com.artheia.usbcamera.utils;
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.text.TextUtils;
+import android.util.Log;
 
 
 import java.util.HashMap;
@@ -131,6 +133,8 @@ public class TtsSpeaker{
      * @param
      */
     public void addMessageFlush(String message) {
+        if (TextUtils.isEmpty(message)) return;
+        Log.d("kim", "----addMessageFlush--" + message);
         if (mTextToSpeech == null) return;
         mTextToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, ttsOptions);
 

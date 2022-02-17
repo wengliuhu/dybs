@@ -1,6 +1,6 @@
 precision highp float;
 
-uniform sampler2D uTexture;
+uniform sampler2D sTexture;
 uniform float uWidth;
 uniform float uHeight;
 varying vec2 vTextureCo;
@@ -15,7 +15,7 @@ const mat3 GY=mat3(-1., -2., -1., 0., 0., 0., +1., +2., +1.);
 //Gy为[-1 -2 -1 0 0 0 +1 +2 +1] 3*3矩阵
 
 float colorR(vec2 center,float shiftX,float shiftY){
-    return texture2D(uTexture,vec2(vTextureCo.x+shiftX/uWidth,vTextureCo.y+shiftY/uHeight)).r;
+    return texture2D(sTexture,vec2(vTextureCo.x+shiftX/uWidth,vTextureCo.y+shiftY/uHeight)).r;
 }
 
 void main(){

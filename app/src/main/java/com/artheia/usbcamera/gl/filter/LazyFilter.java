@@ -46,9 +46,9 @@ public class LazyFilter extends BaseFilter {
                         "}",
                 "precision mediump float;\n" +
                         "varying vec2 vTextureCo;\n" +
-                        "uniform sampler2D uTexture;\n" +
+                        "uniform sampler2D sTexture;\n" +
                         "void main() {\n" +
-                        "    gl_FragColor = texture2D( uTexture, vTextureCo);\n" +
+                        "    gl_FragColor = texture2D( sTexture, vTextureCo);\n" +
                         "}");
     }
 

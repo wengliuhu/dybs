@@ -117,21 +117,21 @@ public class YuvOutputFilter extends BaseFilter {
                 "precision highp int;\n" +
                 "\n" +
                 "varying vec2 vTextureCo;\n" +
-                "uniform sampler2D uTexture;\n" +
+                "uniform sampler2D sTexture;\n" +
                 "\n" +
                 "uniform float uWidth;\n" +
                 "uniform float uHeight;\n" +
                 "\n" +
                 "float cY(float x,float y){\n" +
-                "    vec4 c=texture2D(uTexture,vec2(x,y));\n" +
+                "    vec4 c=texture2D(sTexture,vec2(x,y));\n" +
                 "    return c.r*0.257+c.g*0.504+c.b*0.098+0.0625;\n" +
                 "}\n" +
                 "\n" +
                 "vec4 cC(float x,float y,float dx,float dy){\n" +
-                "    vec4 c0=texture2D(uTexture,vec2(x,y));\n" +
-                "    vec4 c1=texture2D(uTexture,vec2(x+dx,y));\n" +
-                "    vec4 c2=texture2D(uTexture,vec2(x,y+dy));\n" +
-                "    vec4 c3=texture2D(uTexture,vec2(x+dx,y+dy));\n" +
+                "    vec4 c0=texture2D(sTexture,vec2(x,y));\n" +
+                "    vec4 c1=texture2D(sTexture,vec2(x+dx,y));\n" +
+                "    vec4 c2=texture2D(sTexture,vec2(x,y+dy));\n" +
+                "    vec4 c3=texture2D(sTexture,vec2(x+dx,y+dy));\n" +
                 "    return (c0+c1+c2+c3)/4.;\n" +
                 "}\n" +
                 "\n" +
