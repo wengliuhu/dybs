@@ -1,19 +1,6 @@
 package com.artheia.usbcamera.view;
 
 
-
-import static com.artheia.usbcamera.view.widget.AppConstant.BRIGHTNESS;
-import static com.artheia.usbcamera.view.widget.AppConstant.COLOR_2;
-import static com.artheia.usbcamera.view.widget.AppConstant.COLOR_BORDER;
-import static com.artheia.usbcamera.view.widget.AppConstant.COLOR_COLORIZE;
-import static com.artheia.usbcamera.view.widget.AppConstant.COLOR_COMPARE;
-import static com.artheia.usbcamera.view.widget.AppConstant.COLOR_GRAY;
-import static com.artheia.usbcamera.view.widget.AppConstant.COLOR_RESET;
-import static com.artheia.usbcamera.view.widget.AppConstant.COLOR_RESOLUTION;
-import static com.artheia.usbcamera.view.widget.AppConstant.COLOR_REVERSE;
-import static com.artheia.usbcamera.view.widget.AppConstant.CONTRAST;
-import static com.artheia.usbcamera.view.widget.AppConstant.SCALE;
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,28 +8,37 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
-
 
 import com.artheia.usbcamera.R;
 import com.artheia.usbcamera.bean.ConfigBean;
+import com.artheia.usbcamera.bean.DATA;
+import com.artheia.usbcamera.databinding.DioalogSettingLayoutBinding;
 import com.artheia.usbcamera.utils.TtsSpeaker;
 import com.artheia.usbcamera.view.widget.AppConstant;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.artheia.usbcamera.view.widget.AppConstant.BRIGHTNESS;
+import static com.artheia.usbcamera.view.widget.AppConstant.COLOR_RESET;
+import static com.artheia.usbcamera.view.widget.AppConstant.COLOR_RESOLUTION;
+import static com.artheia.usbcamera.view.widget.AppConstant.CONTRAST;
+import static com.artheia.usbcamera.view.widget.AppConstant.SCALE;
+
 /**
  * Created by hujingjing on 2021/10/9 10:27
  */
 public class SettingDialog extends DialogFragment {
+    private DioalogSettingLayoutBinding mDataBingding;
 
     public interface DialogCallBack {
         void onDialogCallBack(View view, int type, int progress, boolean isChecked);
@@ -57,12 +53,12 @@ public class SettingDialog extends DialogFragment {
     private SeekBar mSeekBarContrast;//对比度
     private SeekBar mSeekBarBrightness;//亮度
     private SeekBar mSeekBarScale;//缩放
-    private CheckBox mCheckBox2Colors;//两色
-    private CheckBox mCheckBoxGray;//黑白（灰度）
-    private CheckBox mCheckBoxReverse;//反相
-    private CheckBox mCheckBoxBorder;//描边
-    private CheckBox mCheckBoxCompare;//对比
-    private CheckBox mCheckboxColorize;//伪彩
+//    private CheckBox mCheckBox2Colors;//两色
+//    private CheckBox mCheckBoxGray;//黑白（灰度）
+//    private CheckBox mCheckBoxReverse;//反相
+//    private CheckBox mCheckBoxBorder;//描边
+//    private CheckBox mCheckBoxCompare;//对比
+//    private CheckBox mCheckboxColorize;//伪彩
     private TextView mTvContrast;
     private TextView mTvBrightness;
     private TextView mTvScale;
@@ -70,8 +66,9 @@ public class SettingDialog extends DialogFragment {
     private TextView mTvReset;
     private TextView mTvResolution;
     private View mResolutionView;
-    private TextView mTvOriginalColor;
-    private TextView mTvGrayColor;
+//    private TextView mTvOriginalColor;
+//    private TextView mTvGrayColor;
+//    private TextView mTvBrightYellowColor;
 
     private DialogCallBack mDialogCallBack;
 
@@ -84,8 +81,8 @@ public class SettingDialog extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dioalog_setting_layout, container, false);
-        return view;
+        mDataBingding = DataBindingUtil.inflate(inflater, R.layout.dioalog_setting_layout, container, false);
+        return mDataBingding.getRoot();
     }
 
     @Override
@@ -97,12 +94,12 @@ public class SettingDialog extends DialogFragment {
         mSeekBarContrast = view.findViewById(R.id.seekbar_contrast);
         mSeekBarBrightness = view.findViewById(R.id.seekbar_brightness);
         mSeekBarScale = view.findViewById(R.id.seekbar_scale);
-        mCheckBox2Colors = view.findViewById(R.id.cb_2_colors);
-        mCheckBoxGray = view.findViewById(R.id.cb_gray);
-        mCheckBoxReverse = view.findViewById(R.id.cb_reserve);
-        mCheckBoxBorder = view.findViewById(R.id.cb_border);
-        mCheckBoxCompare = view.findViewById(R.id.cb_compare);
-        mCheckboxColorize = view.findViewById(R.id.cb_colorize);
+//        mCheckBox2Colors = view.findViewById(R.id.cb_2_colors);
+//        mCheckBoxGray = view.findViewById(R.id.cb_gray);
+//        mCheckBoxReverse = view.findViewById(R.id.cb_reserve);
+//        mCheckBoxBorder = view.findViewById(R.id.cb_border);
+//        mCheckBoxCompare = view.findViewById(R.id.cb_compare);
+//        mCheckboxColorize = view.findViewById(R.id.cb_colorize);
         mTvContrast = view.findViewById(R.id.tv_contrast);
         mTvBrightness = view.findViewById(R.id.tv_brightness);
         mTvScale = view.findViewById(R.id.tv_scale);
@@ -110,16 +107,31 @@ public class SettingDialog extends DialogFragment {
         mTvReset = view.findViewById(R.id.tv_reset);
         mResolutionView = view.findViewById(R.id.ll_resolution);
         mTvResolution = view.findViewById(R.id.tv_resolution);
-        mTvOriginalColor = view.findViewById(R.id.tv_original_color);
-        mTvGrayColor = view.findViewById(R.id.tv_gray_color);
+//        mTvOriginalColor = view.findViewById(R.id.tv_original_color);
+//        mTvGrayColor = view.findViewById(R.id.tv_gray_color);
+//        mTvBrightYellowColor = view.findViewById(R.id.tv_bright_yellow_color);
         mTvResolution.setText(ConfigBean.getInstance().getWidth() + "x" + ConfigBean.getInstance().getHeight());
-        if (ConfigBean.getInstance().isGrayShow()) {
-            mTvGrayColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
-            mTvOriginalColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorWhite));
-        } else {
-            mTvGrayColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorWhite));
-            mTvOriginalColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
-        }
+
+        mDataBingding.rbBrightYellow.setTag(DATA.BRIGHT_YELLOW);
+        mDataBingding.rbDarkTea.setTag(DATA.DARK_TEA);
+        mDataBingding.rbOriginal.setTag(DATA.ORIGINAL);
+        mDataBingding.rbGray.setTag(DATA.GRAY);
+        mDataBingding.rbLightTea.setTag(DATA.LIGHT_TEA);
+        mDataBingding.rbReverse.setTag(DATA.REVERSE);
+        mDataBingding.rgColor.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId)
+            {
+                RadioButton button = group.findViewById(checkedId);
+                Object tag = button.getTag();
+                if (mDialogCallBack != null && tag instanceof Integer){
+                    ConfigBean.getInstance().setFilterColor((Integer) tag);
+                    mDialogCallBack.onDialogCallBack(button, (Integer) tag, 0, true);
+                }
+            }
+        });
+        RadioButton button = mDataBingding.rgColor.findViewWithTag(ConfigBean.getInstance().getFilterColor());
+        button.setChecked(true);
         initListener();
         initList();
     }
@@ -197,7 +209,7 @@ public class SettingDialog extends DialogFragment {
                 ConfigBean.getInstance().setScale(seekBar.getProgress());
             }
         });
-        //两色
+/*        //两色
         mCheckBox2Colors.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -256,7 +268,7 @@ public class SettingDialog extends DialogFragment {
                     mDialogCallBack.onDialogCallBack(buttonView, COLOR_COLORIZE, 0, isChecked);
                 }
             }
-        });
+        });*/
         //分辨率
         mResolutionView.setOnClickListener(v-> {
             if (mDialogCallBack != null) {
@@ -279,12 +291,13 @@ public class SettingDialog extends DialogFragment {
             mSeekBarContrast.setProgress(AppConstant.CONFIG_CONTRAST);
             mSeekBarBrightness.setProgress(AppConstant.CONFIG_BRIGHTNESS);
             mSeekBarScale.setProgress(AppConstant.CONFIG_SCALE);
-            mCheckBoxGray.setChecked(false);
+//            mCheckBoxGray.setChecked(false);
             mTvScale.setText("x " + AppConstant.CONFIG_SCALE);
-            mTvGrayColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorWhite));
-            mTvOriginalColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+//            mTvGrayColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorWhite));
+//            mTvOriginalColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+            ((RadioButton)mDataBingding.rgColor.findViewWithTag(DATA.ORIGINAL)).setChecked(true);
         });
-        mCheckBox2Colors.setOnClickListener(v-> {
+       /* mCheckBox2Colors.setOnClickListener(v-> {
             updateCheckBoxStatus(mCheckBox2Colors);
         });
         mCheckBoxGray.setOnClickListener(v-> {
@@ -319,16 +332,25 @@ public class SettingDialog extends DialogFragment {
             }
         });
 
+        mTvGrayColor.setOnClickListener(v-> {
+            mTvGrayColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+            mTvOriginalColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorWhite));
+            ConfigBean.getInstance().setGrayShow(true);
+            if (mDialogCallBack != null) {
+                mDialogCallBack.onDialogCallBack(mTvOriginalColor, COLOR_GRAY, 0, true);
+            }
+        });*/
+
     }
 
-    private void initList() {
+       private void initList() {
         mList.clear();
-        mList.add(mCheckBox2Colors);
+/*        mList.add(mCheckBox2Colors);
         mList.add(mCheckBoxGray);
         mList.add(mCheckBoxCompare);
         mList.add(mCheckboxColorize);
         mList.add(mCheckBoxBorder);
-        mList.add(mCheckBoxReverse);
+        mList.add(mCheckBoxReverse);*/
     }
 
     private void updateCheckBoxStatus(CheckBox originalCheckBox) {

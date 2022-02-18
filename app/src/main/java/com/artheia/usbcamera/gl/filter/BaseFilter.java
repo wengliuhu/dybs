@@ -38,7 +38,7 @@ import java.util.LinkedList;
  * @version v1.0 2017:10:31 10:48
  */
 public abstract class   BaseFilter implements Renderer {
-    private final String TAG = "BaseFilter";
+    private final String TAG = getClass().toString();
     public static final String BASE_VERT="attribute vec4 aVertexCo;\n" +
             "attribute vec2 aTextureCo;\n" +
             "\n" +

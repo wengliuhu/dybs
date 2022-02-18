@@ -47,6 +47,9 @@ public class ConfigBean implements Serializable {
     // 是否伪彩显示
     private boolean colorizeShow;
 
+    private int filterColor;
+
+
     public ConfigBean(){
     }
 
@@ -208,6 +211,17 @@ public class ConfigBean implements Serializable {
 
     public void setColorizeShow(boolean colorizeShow) {
         this.colorizeShow = colorizeShow;
+        save();
+    }
+
+    public int getFilterColor()
+    {
+        return filterColor;
+    }
+
+    public void setFilterColor(@DATA.COLOR int filterColor)
+    {
+        this.filterColor = filterColor;
         save();
     }
 

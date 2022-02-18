@@ -32,6 +32,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.artheia.usbcamera.R;
 import com.artheia.usbcamera.UVCCameraHelper;
 import com.artheia.usbcamera.bean.ConfigBean;
+import com.artheia.usbcamera.bean.DATA;
 import com.artheia.usbcamera.ocr.FileUtil;
 import com.artheia.usbcamera.ocr.OcrHelper;
 import com.artheia.usbcamera.ocr.OcrResult;
@@ -43,6 +44,7 @@ import com.artheia.usbcamera.view.widget.AppConstant;
 import com.artheia.usbcamera.view.widget.AutoScanView;
 import com.artheia.usbcamera.view.widget.LightScaleView;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.Size;
 import com.serenegiant.usb.USBMonitor;
@@ -348,7 +350,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     {
         Log.d(TAG, "-----onTouchEvent----" + event.getAction());
         if (event.getAction() == MotionEvent.ACTION_UP){
-            if (SystemClock.uptimeMillis() - lastClickTime < 1000){
+            if (SystemClock.uptimeMillis() - lastClickTime < 600){
                 Log.d(TAG, "-----onTouchEvent---capturePicture-");
 
          /*       // TODO: 2022/2/15 测试OCR
@@ -387,7 +389,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                     @Override
                     public void onCaptureResult(String picPath)
                     {
-                        OcrHelper.getInstance().recognizeGeneralBasic(picPath);
+//                        OcrHelper.getInstance().recognizeGeneralBasic(picPath);
 
                         RecognizeService.recognizeGeneralBasic(USBCameraActivity.this, picPath,
                                 new RecognizeService.ServiceListener() {
@@ -396,22 +398,29 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                                         Log.d(TAG, result);
 //                                Toast.makeText(USBCameraActivity.this, "识别图片成功：" + result, Toast.LENGTH_LONG).show();
                                         Gson gson = new Gson();
-                                        OcrResult ocrResult = gson.fromJson(result, OcrResult.class);
-                                        if (ocrResult == null){
-                                            Toast.makeText(USBCameraActivity.this, "识别图片失败：" + result, Toast.LENGTH_LONG).show();
-                                            return;
-                                        }
-                                        StringBuffer buffer = new StringBuffer();
-                                        if (ocrResult.getWords_result() != null){
-                                            Iterator<OcrResult.WordsResult> iterator = ocrResult.getWords_result().iterator();
-                                            while (iterator.hasNext()){
-                                                buffer.append(iterator.next().getWords());
+                                        try
+                                        {
+                                            OcrResult ocrResult = gson.fromJson(result, OcrResult.class);
+                                            if (ocrResult == null){
+                                                Toast.makeText(USBCameraActivity.this, "识别图片失败：" + result, Toast.LENGTH_LONG).show();
+                                                return;
                                             }
-                                        }
-                                        if (!TextUtils.isEmpty(buffer.toString())){
-                                            TtsSpeaker.getInstance().addMessageFlush(buffer.toString());
-                                        }else {
-                                            Toast.makeText(USBCameraActivity.this, "未识别到文字!", Toast.LENGTH_LONG).show();
+                                            StringBuffer buffer = new StringBuffer();
+                                            if (ocrResult.getWords_result() != null){
+                                                Iterator<OcrResult.WordsResult> iterator = ocrResult.getWords_result().iterator();
+                                                while (iterator.hasNext()){
+                                                    buffer.append(iterator.next().getWords());
+                                                }
+                                            }
+                                            if (!TextUtils.isEmpty(buffer.toString())){
+                                                TtsSpeaker.getInstance().addMessageFlush(buffer.toString());
+                                            }else {
+                                                Toast.makeText(USBCameraActivity.this, "未识别到文字!", Toast.LENGTH_LONG).show();
+                                            }
+                                        } catch (Exception e)
+                                        {
+                                            Log.d("---kim--", "---------------------" + result);
+                                            e.printStackTrace();
                                         }
 
                                     }
@@ -506,10 +515,10 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                         case AppConstant.COLOR_RESOLUTION:
                             showResolutionListDialog();
                             break;
-                        //黑白（灰度）
+                      /*  //黑白（灰度）
                         case AppConstant.COLOR_GRAY:
                             mUVCCameraView.changeGray(isChecked);
-                            break;
+                            break;*/
                         //重置
                         case AppConstant.COLOR_RESET:
                             mCameraHelper.resetModelValue(UVCCameraHelper.MODE_CONTRAST);
@@ -529,6 +538,38 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                                 updateResolution(list.get(0));
                             }
                             break;
+
+                            // 色彩部分
+                        case DATA.ORIGINAL:
+                        {
+                            mUVCCameraView.changeOriginal();
+                            break;
+                        }
+                        case DATA.GRAY:
+                        {
+                            mUVCCameraView.changeGray(true);
+                            break;
+                        }
+                        case DATA.BRIGHT_YELLOW:
+                        {
+                            mUVCCameraView.changeBrightYellow();
+                            break;
+                        }
+                        case DATA.REVERSE:
+                        {
+                            mUVCCameraView.changeReverse();
+                            break;
+                        }
+                        case DATA.DARK_TEA:
+                        {
+                            mUVCCameraView.changeDarkTea();
+                            break;
+                        }
+                        case DATA.LIGHT_TEA:
+                        {
+                            mUVCCameraView.changeLightTea();
+                            break;
+                        }
                     }
                 }
             }

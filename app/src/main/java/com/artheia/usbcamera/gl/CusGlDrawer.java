@@ -1,24 +1,10 @@
 package com.artheia.usbcamera.gl;
 
 
-import android.opengl.GLES20;
-import android.opengl.Matrix;
-import android.text.TextUtils;
-import android.util.Log;
-
-import com.artheia.usbcamera.application.MyApplication;
+import com.artheia.usbcamera.gl.core.Renderer;
 import com.artheia.usbcamera.gl.filter.BaseFilter;
 import com.artheia.usbcamera.gl.filter.GroupFilter;
-import com.artheia.usbcamera.utils.ShaderUtils;
 import com.serenegiant.glutils.GLHelper;
-import com.serenegiant.glutils.IDrawer2D;
-import com.serenegiant.glutils.IDrawer2dES2;
-import com.serenegiant.glutils.ITexture;
-import com.serenegiant.glutils.TextureOffscreen;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 
 /**
  * @author : wengliuhu
@@ -46,14 +32,14 @@ public class CusGlDrawer {
 
     private String fragmentFilePath;
 
-    private GroupFilter groupFilter;
+    private WrapRenderer wrapRenderer;
 
-    public GroupFilter getGroupFilter() {
-        return groupFilter;
+    public WrapRenderer getWrapRenderer() {
+        return wrapRenderer;
     }
 
-    public void setGroupFilter(GroupFilter groupFilter) {
-        this.groupFilter = groupFilter;
+    public void setWrapRenderer(WrapRenderer wrapRenderer) {
+        this.wrapRenderer = wrapRenderer;
     }
 
     public CusGlDrawer(boolean isOES) {
@@ -62,7 +48,7 @@ public class CusGlDrawer {
     }
 
     public void init(){
-        groupFilter.create();
+        wrapRenderer.create();
     }
 
     public boolean isOES() {
@@ -70,11 +56,11 @@ public class CusGlDrawer {
     }
 
     public void release() {
-        groupFilter.destroy();
+        wrapRenderer.destroy();
     }
 
     public synchronized void draw(int texId, float[] tex_matrix, int offset) {
-        groupFilter.draw(texId, tex_matrix, offset);
+        wrapRenderer.draw(texId, tex_matrix, offset);
     }
 
     public int initTex() {
@@ -85,9 +71,9 @@ public class CusGlDrawer {
         GLHelper.deleteTex(hTex);
     }
 
-    public synchronized void updateShader(BaseFilter filter) {
+    public synchronized void updateShader(Renderer renderer) {
         release();
-        groupFilter.addFilter(filter);
-        groupFilter.create();
+        wrapRenderer = new WrapRenderer(renderer);
+        wrapRenderer.create();
     }
 }

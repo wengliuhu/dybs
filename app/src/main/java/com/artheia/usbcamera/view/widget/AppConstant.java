@@ -14,6 +14,7 @@ public class AppConstant {
     public static final int BRIGHTNESS = 1002;
     public static final int SCALE = 1003;
     public static final int COLOR_2 = 1004;
+
     public static final int COLOR_GRAY = 1005;
     public static final int COLOR_REVERSE = 1006;
     public static final int COLOR_BORDER = 1007;

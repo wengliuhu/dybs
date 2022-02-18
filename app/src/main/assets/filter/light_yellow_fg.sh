@@ -5,5 +5,7 @@ uniform samplerExternalOES sTexture;
 varying highp vec2 vTextureCoord;
 
 void main() {
-gl_FragColor = texture2D( sTexture, vTextureCoord);
+
+ vec4 mask = texture2D(sTexture, vTextureCoord);
+    gl_FragColor = vec4(0.9020, 1.0, mask[2], 0);
 }
