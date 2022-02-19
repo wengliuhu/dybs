@@ -82,16 +82,16 @@ public class YuvOutputFilter extends BaseFilter {
     }
 
     @Override
-    public void draw(int texture) {
+    public void draw(int texId, float[] tex_matrix, int offset) {
         onTaskExec();
         boolean isBlend= GLES20.glIsEnabled(GLES20.GL_BLEND);
         GLES20.glDisable(GLES20.GL_BLEND);
         GLES20.glGetIntegerv(GLES20.GL_VIEWPORT,lastViewPort,0);
         GLES20.glViewport(0,0,mWidth,mHeight);
         if(mScaleFilter!=null){
-            mExportFilter.draw(mScaleFilter.drawToTexture(texture));
+            mExportFilter.draw(mScaleFilter.drawToTexture(texId, tex_matrix, offset), tex_matrix, offset);
         }else{
-            mExportFilter.draw(texture);
+            mExportFilter.draw(texId, tex_matrix, offset);
         }
         GLES20.glReadPixels(0,0,mWidth,mHeight*3/8,GLES20.GL_RGBA,GLES20.GL_UNSIGNED_BYTE,mTempBuffer);
         GLES20.glViewport(lastViewPort[0],lastViewPort[1],lastViewPort[2],lastViewPort[3]);
@@ -117,21 +117,21 @@ public class YuvOutputFilter extends BaseFilter {
                 "precision highp int;\n" +
                 "\n" +
                 "varying vec2 vTextureCo;\n" +
-                "uniform sampler2D sTexture;\n" +
+                "uniform sampler2D uTexture;\n" +
                 "\n" +
                 "uniform float uWidth;\n" +
                 "uniform float uHeight;\n" +
                 "\n" +
                 "float cY(float x,float y){\n" +
-                "    vec4 c=texture2D(sTexture,vec2(x,y));\n" +
+                "    vec4 c=texture2D(uTexture,vec2(x,y));\n" +
                 "    return c.r*0.257+c.g*0.504+c.b*0.098+0.0625;\n" +
                 "}\n" +
                 "\n" +
                 "vec4 cC(float x,float y,float dx,float dy){\n" +
-                "    vec4 c0=texture2D(sTexture,vec2(x,y));\n" +
-                "    vec4 c1=texture2D(sTexture,vec2(x+dx,y));\n" +
-                "    vec4 c2=texture2D(sTexture,vec2(x,y+dy));\n" +
-                "    vec4 c3=texture2D(sTexture,vec2(x+dx,y+dy));\n" +
+                "    vec4 c0=texture2D(uTexture,vec2(x,y));\n" +
+                "    vec4 c1=texture2D(uTexture,vec2(x+dx,y));\n" +
+                "    vec4 c2=texture2D(uTexture,vec2(x,y+dy));\n" +
+                "    vec4 c3=texture2D(uTexture,vec2(x+dx,y+dy));\n" +
                 "    return (c0+c1+c2+c3)/4.;\n" +
                 "}\n" +
                 "\n" +
@@ -280,8 +280,8 @@ public class YuvOutputFilter extends BaseFilter {
         }
 
         @Override
-        protected void onSetExpandData() {
-            super.onSetExpandData();
+        protected void onSetExpandData(int texId, float[] tex_matrix, int offset) {
+            super.onSetExpandData(texId, tex_matrix, offset);
             GLES20.glUniform1f(mGLWidth,this.mWidth);
             GLES20.glUniform1f(mGLHeight,this.mHeight);
         }

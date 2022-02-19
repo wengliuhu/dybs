@@ -17,7 +17,6 @@ import android.content.res.Resources;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
 
 /**
  * GroupFilter 滤镜组，将多个滤镜串联起来，合并成一个滤镜
@@ -101,14 +100,13 @@ public class GroupFilter extends LazyFilter {
     }
 
     @Override
-    public void draw(int texture) {
-        int tempTextureId=texture;
+    public void draw(int texId, float[] tex_matrix, int offset) {
+        int tempTextureId=texId;
         for (int i=0;i<mGroup.size();i++){
             BaseFilter filter=mGroup.get(i);
-            tempTextureId=filter.drawToTexture(tempTextureId);
+            tempTextureId=filter.drawToTexture(tempTextureId, tex_matrix, offset);
         }
-        super.draw(tempTextureId);
+        super.draw(tempTextureId, tex_matrix, offset);
     }
-
 }
 

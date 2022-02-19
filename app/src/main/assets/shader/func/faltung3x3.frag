@@ -1,13 +1,13 @@
 precision mediump float;
 varying vec2 vTextureCo;
-uniform sampler2D sTexture;
+uniform sampler2D uTexture;
 uniform mat3 uFaltung;
 uniform float uWidth;
 uniform float uHeight;
 
 
 vec4 getColor(float x,float y,float p){
-    return p*texture2D(sTexture,vec2(x/uWidth,y/uHeight)+vTextureCo);
+    return p*texture2D(uTexture,vec2(x/uWidth,y/uHeight)+vTextureCo);
 }
 
 void main() {

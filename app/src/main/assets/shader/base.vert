@@ -1,14 +1,14 @@
 precision highp float;
 precision highp int;
-attribute vec4 aPosition;
-attribute vec4 aTextureCoord;
+attribute vec4 aVertexCo;
+attribute vec2 aTextureCo;
 
-uniform mat4 uMVPMatrix;
-uniform mat4 uTexMatrix;
+uniform mat4 uVertexMatrix;
+uniform mat4 uTextureMatrix;
 
-varying vec2 vTextureCoord;
+varying vec2 vTextureCo;
 
 void main(){
- gl_Position = uMVPMatrix * aPosition;
- vTextureCoord = (uTexMatrix * aTextureCoord).xy;
+    gl_Position = uVertexMatrix*aVertexCo;
+    vTextureCo = (uTextureMatrix*vec4(aTextureCo,0,1)).xy;
 }

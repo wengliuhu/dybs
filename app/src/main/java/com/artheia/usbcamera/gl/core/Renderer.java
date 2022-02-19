@@ -35,9 +35,9 @@ public interface Renderer {
 
     /**
      * 渲染
-     * @param texture 输入纹理
+     * @param texId 输入纹理
      */
-    void draw(int texture);
+    void draw(int texId, float[] tex_matrix, int offset);
 
     /**
      * 销毁

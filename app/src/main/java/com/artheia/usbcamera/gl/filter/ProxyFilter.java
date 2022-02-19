@@ -41,13 +41,13 @@ public class ProxyFilter extends BaseFilter {
     }
 
     @Override
-    public void draw(int texture) {
-        base.draw(texture);
+    public void draw(int texId, float[] tex_matrix, int offset) {
+        base.draw(texId, tex_matrix, offset);
     }
 
     @Override
-    public int drawToTexture(int texture) {
-        return base.drawToTexture(texture);
+    public int drawToTexture(int texId, float[] tex_matrix, int offset) {
+        return base.drawToTexture(texId, tex_matrix, offset);
     }
 
     @Override
@@ -76,13 +76,13 @@ public class ProxyFilter extends BaseFilter {
     }
 
     @Override
-    protected void onSetExpandData() {
-        base.onSetExpandData();
+    protected void onSetExpandData(int texId, float[] tex_matrix, int offset) {
+        base.onSetExpandData(texId, tex_matrix, offset);
     }
 
     @Override
-    protected void onDraw() {
-        base.onDraw();
+    protected void onDraw(int texId) {
+        base.onDraw(texId);
     }
 
     @Override

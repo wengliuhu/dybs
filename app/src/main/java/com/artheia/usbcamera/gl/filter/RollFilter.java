@@ -47,8 +47,10 @@ public class RollFilter extends LazyFilter {
         mFrameCount=0;
     }
 
+
+
     @Override
-    protected void onDraw() {
+    protected void onDraw(int texId) {
         mFrameCount++;
         if(mFrameCount>=(mXRollTime+mYRollTime)){
             mFrameCount=0;
@@ -58,18 +60,18 @@ public class RollFilter extends LazyFilter {
             int shift= (mFrameCount*mWidth/mXRollTime)/2;
             for (int i=0;i<3;i++){
                 GLES20.glViewport(mWidth*i/2-shift,0,mWidth/2,mHeight/2);
-                super.onDraw();
+                super.onDraw(texId);
                 GLES20.glViewport(mWidth*i/2+shift-mWidth/2,mHeight/2,mWidth/2,mHeight/2);
-                super.onDraw();
+                super.onDraw(texId);
             }
         }else{
             //todo y方向滚动
             int shift= (mHeight-(mFrameCount-mXRollTime)*mHeight/mYRollTime)/2;
             for (int i=0;i<3;i++){
                 GLES20.glViewport(0,mHeight*i/2-shift,mWidth/2,mHeight/2);
-                super.onDraw();
+                super.onDraw(texId);
                 GLES20.glViewport(mWidth/2,mHeight*i/2+shift-mHeight/2,mWidth/2,mHeight/2);
-                super.onDraw();
+                super.onDraw(texId);
             }
         }
     }

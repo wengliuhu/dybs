@@ -1,7 +1,6 @@
 precision mediump float;
-
-uniform samplerExternalOES sTexture;
-varying highp vec2 vTextureCoord;
+varying vec2 vTextureCo;
+uniform sampler2D uTexture;
 void main() {
-     gl_FragColor = texture2D(sTexture, vTextureCoord);
+    gl_FragColor = texture2D( uTexture, vTextureCo);
 }

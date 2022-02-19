@@ -19,8 +19,8 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        mCrashHandler = CrashHandler.getInstance();
-        mCrashHandler.init(getApplicationContext(), getClass());
+//        mCrashHandler = CrashHandler.getInstance();
+//        mCrashHandler.init(getApplicationContext(), getClass());
         mInstance = this;
         TtsSpeaker.getInstance().init(this);
     }

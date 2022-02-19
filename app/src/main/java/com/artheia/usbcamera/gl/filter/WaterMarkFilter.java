@@ -81,22 +81,24 @@ public class WaterMarkFilter extends LazyFilter{
         mark.create();
     }
 
+
     @Override
-    protected void onDraw() {
+    protected void onDraw(int texId) {
         //todo change blend and viewport
-        super.onDraw();
-        if(markTextureId!=-1){
-            GLES20.glGetIntegerv(GLES20.GL_VIEWPORT,viewPort,0);
-            GLES20.glViewport(markPort[0],mHeight-markPort[3]-markPort[1],markPort[2],markPort[3]);
-
-            GLES20.glEnable(GLES20.GL_BLEND);
-            GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA,GLES20.GL_ONE_MINUS_SRC_ALPHA);
-            GLES20.glBlendEquation(GLES20.GL_FUNC_ADD);
-            mark.draw(markTextureId);
-            GLES20.glDisable(GLES20.GL_BLEND);
-
-            GLES20.glViewport(viewPort[0],viewPort[1],viewPort[2],viewPort[3]);
-        }
+        super.onDraw(texId);
+//        if(markTextureId!=-1){
+//            GLES20.glGetIntegerv(GLES20.GL_VIEWPORT,viewPort,0);
+//            GLES20.glViewport(markPort[0],mHeight-markPort[3]-markPort[1],markPort[2],markPort[3]);
+//
+//            GLES20.glEnable(GLES20.GL_BLEND);
+//            GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA,GLES20.GL_ONE_MINUS_SRC_ALPHA);
+//            GLES20.glBlendEquation(GLES20.GL_FUNC_ADD);
+//            // TODO: 2022/2/18 此处先不需要水印
+//            mark.draw(markTextureId);
+//            GLES20.glDisable(GLES20.GL_BLEND);
+//
+//            GLES20.glViewport(viewPort[0],viewPort[1],viewPort[2],viewPort[3]);
+//        }
         //todo reset blend and view port
     }
 

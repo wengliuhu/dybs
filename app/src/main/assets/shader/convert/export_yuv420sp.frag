@@ -2,7 +2,7 @@ precision highp float;
 precision highp int;
 
 varying vec2 vTextureCo;
-uniform sampler2D sTexture;
+uniform sampler2D uTexture;
 
 //为了简化计算，宽高都必须为8的倍数
 uniform float uWidth;			// 纹理宽
@@ -16,17 +16,17 @@ uniform float uHeight;			// 纹理高
 //然后将转换的结果填充到输出位置
 
 float cY(float x,float y){
-    vec4 c=texture2D(sTexture,vec2(x,y));
+    vec4 c=texture2D(uTexture,vec2(x,y));
     return c.r*0.2990+c.g*0.5870+c.b*0.1140;
 }
 
 float cU(float x,float y){
-    vec4 c=texture2D(sTexture,vec2(x,y));
+    vec4 c=texture2D(uTexture,vec2(x,y));
     return -0.1471*c.r - 0.2889*c.g + 0.4360*c.b+0.5000;
 }
 
 float cV(float x,float y){
-    vec4 c=texture2D(sTexture,vec2(x,y));
+    vec4 c=texture2D(uTexture,vec2(x,y));
     return 0.6150*c.r - 0.5150*c.g - 0.1000*c.b+0.5000;
 }
 

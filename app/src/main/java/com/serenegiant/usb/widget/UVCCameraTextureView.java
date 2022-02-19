@@ -36,6 +36,10 @@ import android.view.Surface;
 import android.view.TextureView;
 
 import com.artheia.usbcamera.application.MyApplication;
+import com.artheia.usbcamera.gl.CusGlDrawer;
+import com.artheia.usbcamera.gl.MyGlDrawer;
+import com.artheia.usbcamera.gl.filter.BaseFilter;
+import com.artheia.usbcamera.gl.filter.CandyFilter;
 import com.artheia.usbcamera.utils.ShaderUtils;
 import com.serenegiant.glutils.EGLBase;
 import com.serenegiant.glutils.GLDrawer2D;
@@ -362,6 +366,9 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 				case MSG_UPDATE_SHADER: {
 					String vsStr = msg.getData().getString("vs");
 					String fsStr = msg.getData().getString("fs");
+					BaseFilter filter = new BaseFilter(MyApplication.getAPP().getResources(), vsStr, fsStr) {
+
+					};
 					mThread.updateShader(vsStr, fsStr);
 					break;
 				}
@@ -377,7 +384,8 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	    	private EGLBase mEgl;
 	    	/** IEglSurface instance related to this TextureView */
 	    	private EGLBase.IEglSurface mEglSurface;
-	    	private GLDrawer2D mDrawer;
+			// TODO: 2022/2/18 替换成组合滤镜
+	    	private CusGlDrawer mDrawer;
 	    	private int mTexId = -1;
 	    	/** SurfaceTexture instance to receive video images */
 	    	private SurfaceTexture mPreviewSurface;
@@ -442,6 +450,8 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 		            mPreviewSurface = new SurfaceTexture(mTexId);
 					mPreviewSurface.setDefaultBufferSize(mViewWidth, mViewHeight);
 		            mPreviewSurface.setOnFrameAvailableListener(mHandler);
+					// TODO: 2022/2/18 增加尺寸
+					mDrawer.getGroupFilter().sizeChanged(mViewWidth, mViewHeight);
 		            // notify to caller thread that previewSurface is ready
 					mSync.notifyAll();
 	            }
@@ -565,7 +575,8 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 			} */
 
 			public void updateShader(String vsStr, String fsStr){
-				mDrawer.updateShader(vsStr, fsStr);
+				mDrawer.updateShader(new BaseFilter(MyApplication.getAPP().getResources(), vsStr, fsStr) {
+				});
 			}
 
 			@Override
@@ -595,7 +606,9 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	    		mEglSurface = mEgl.createFromSurface(mSurface);
 	    		mEglSurface.makeCurrent();
 	    		// create drawing object
-	    		mDrawer = new GLDrawer2D(true);
+	    		mDrawer = new CusGlDrawer(false);
+				mDrawer.setGroupFilter(new CandyFilter(MyApplication.getAPP().getResources()));
+				mDrawer.init();
 			}
 
 	    	private final void release() {

@@ -37,8 +37,8 @@ public class WaterColorFilter extends BaseFilter {
     }
 
     @Override
-    protected void onSetExpandData() {
-        super.onSetExpandData();
+    protected void onSetExpandData(int texId, float[] tex_matrix, int offset) {
+        super.onSetExpandData(texId, tex_matrix, offset);
         GLES20.glUniform1f(mGLWidth,mWidth);
         GLES20.glUniform1f(mGLHeight,mHeight);
     }

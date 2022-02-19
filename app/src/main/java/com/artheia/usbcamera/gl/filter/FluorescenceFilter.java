@@ -56,9 +56,10 @@ public class FluorescenceFilter extends BaseFilter {
     }
 
     @Override
-    public void draw(int texture) {
-        mTempTexture=mBlackFilter.drawToTexture(texture);
-        super.draw(texture);
+    public void draw(int texId, float[] tex_matrix, int offset) {
+        mTempTexture=mBlackFilter.drawToTexture(texId, tex_matrix, offset);
+
+        super.draw(texId, tex_matrix, offset);
     }
 
     @Override
@@ -69,8 +70,9 @@ public class FluorescenceFilter extends BaseFilter {
         GLES20.glUniform1i(mGLTexture2,1);
     }
 
+
     @Override
-    protected void onSetExpandData() {
+    protected void onSetExpandData(int texId, float[] tex_matrix, int offset) {
         //todo 根据时间修改
 
         if(isAdd){
@@ -86,8 +88,8 @@ public class FluorescenceFilter extends BaseFilter {
             isAdd=true;
             mStep=0.0f;
         }
+        super.onSetExpandData(texId, tex_matrix, offset);
 
-        super.onSetExpandData();
         GLES20.glUniform4fv(mGLBorderColor,1,mBorderColor,0);
         GLES20.glUniform1f(mGLStep,mStep);
     }

@@ -31,7 +31,7 @@ public class BlackMagicFilter extends GroupFilter {
     protected void initBuffer() {
         super.initBuffer();
         addFilter(new GrayFilter(mRes));
-        addFilter(new BaseFuncFilter(mRes,BaseFuncFilter.FILTER_SOBEL));
+        addFilter(new BaseFuncFilter(mRes, BaseFuncFilter.FILTER_SOBEL));
     }
 }
 

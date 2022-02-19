@@ -33,9 +33,9 @@ public class OesFilter extends BaseFilter {
                 "#extension GL_OES_EGL_image_external : require\n" +
                 "precision mediump float;\n" +
                 "varying vec2 vTextureCo;\n" +
-                "uniform samplerExternalOES sTexture;\n" +
+                "uniform samplerExternalOES uTexture;\n" +
                 "void main() {\n" +
-                "    gl_FragColor = texture2D( sTexture, vTextureCo);\n" +
+                "    gl_FragColor = texture2D( uTexture, vTextureCo);\n" +
                 "}");
     }
 

@@ -2,21 +2,21 @@ precision highp float;
 precision highp int;
 
 varying vec2 vTextureCo;
-uniform sampler2D sTexture;
+uniform sampler2D uTexture;
 
 uniform float uWidth;
 uniform float uHeight;
 
 float cY(float x,float y){
-    vec4 c=texture2D(sTexture,vec2(x,y));
+    vec4 c=texture2D(uTexture,vec2(x,y));
     return c.r*0.2126+c.g*0.7152+c.b*0.0722;
 }
 
 vec4 cC(float x,float y,float dx,float dy){
-    vec4 c0=texture2D(sTexture,vec2(x,y));
-    vec4 c1=texture2D(sTexture,vec2(x+dx,y));
-    vec4 c2=texture2D(sTexture,vec2(x,y+dy));
-    vec4 c3=texture2D(sTexture,vec2(x+dx,y+dy));
+    vec4 c0=texture2D(uTexture,vec2(x,y));
+    vec4 c1=texture2D(uTexture,vec2(x+dx,y));
+    vec4 c2=texture2D(uTexture,vec2(x,y+dy));
+    vec4 c3=texture2D(uTexture,vec2(x+dx,y+dy));
     return (c0+c1+c2+c3)/4.;
 }
 

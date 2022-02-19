@@ -15,6 +15,8 @@ package com.artheia.usbcamera.gl.filter;
 
 import android.content.res.Resources;
 import android.opengl.GLES20;
+import android.util.Log;
+
 
 import com.artheia.usbcamera.gl.core.Renderer;
 import com.artheia.usbcamera.gl.utils.GpuUtils;
@@ -27,26 +29,27 @@ import java.util.LinkedList;
 
 /**
  * BaseFilter 滤镜的基类。对于滤镜而言，要求使用者外部调用的时候必须调用的方法为
- * {@link #create()}、{@link #sizeChanged(int, int)}以及{@link #draw(int)}或者
- * {@link #drawToTexture(int)}。
+ * {@link #create()}、{@link #sizeChanged(int, int)}以及{@link #draw(int, float[], int)}或者
+ * {@link #drawToTexture(int, float[], int)} )}。
  * 在实现Filter子类时，通常需要自行编写shader，shader中的变量应同assets下base.frag及
  * base.vert中变量一致，可以增加。增加的变量需要重写{@link #onCreate()}方法，在其中
  * 获取变量用于传参。
  * @author wuwang
  * @version v1.0 2017:10:31 10:48
  */
-public abstract class BaseFilter implements Renderer
-{
-
-    public static final String BASE_VERT="#version 100\n" +
-            "uniform mat4 uMVPMatrix;\n" +
-            "uniform mat4 uTexMatrix;\n" +
-            "attribute highp vec4 aPosition;\n" +
-            "attribute highp vec4 aTextureCoord;\n" +
-            "varying highp vec2 vTextureCoord;\n" +
-            "void main() {\n" +
-            " gl_Position = uMVPMatrix * aPosition;\n" +
-            " vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
+public abstract class   BaseFilter implements Renderer {
+    private final String TAG = "BaseFilter";
+    public static final String BASE_VERT="attribute vec4 aVertexCo;\n" +
+            "attribute vec2 aTextureCo;\n" +
+            "\n" +
+            "uniform mat4 uVertexMatrix;\n" +
+            "uniform mat4 uTextureMatrix;\n" +
+            "\n" +
+            "varying vec2 vTextureCo;\n" +
+            "\n" +
+            "void main(){\n" +
+            "    gl_Position = uVertexMatrix*aVertexCo;\n" +
+            "    vTextureCo = (uTextureMatrix*vec4(aTextureCo,0,1)).xy;\n" +
             "}";
 
     private float[] mVertexMatrix= MatrixUtils.getOriginalMatrix();
@@ -77,11 +80,16 @@ public abstract class BaseFilter implements Renderer
     private final LinkedList<Runnable> mTasks=new LinkedList<>();
     private final Object Lock = new Object();
 
+    private final int mTexTarget;
+    private final int VERTEX_NUM = 16;
+
     protected BaseFilter(Resources resource,String vertex,String fragment){
         this.mRes=resource;
         this.mVertex=vertex;
         this.mFragment=fragment;
         mFrameTemp=new FrameBuffer();
+        // 开启oes
+        this.mTexTarget ='赥';
         initBuffer();
     }
 
@@ -96,6 +104,10 @@ public abstract class BaseFilter implements Renderer
         mTextureBuffer=texture.asFloatBuffer();
         mTextureBuffer.put(MatrixUtils.getOriginalTextureCo());
         mTextureBuffer.position(0);
+    }
+
+    public boolean isOES() {
+        return this.mTexTarget == 36197;
     }
 
     public void setVertexCo(float[] vertexCo){
@@ -144,24 +156,39 @@ public abstract class BaseFilter implements Renderer
         }else{
             mGLProgram= GpuUtils.createGLProgram(mVertex,mFragment);
         }
-        mGLVertexCo= GLES20.glGetAttribLocation(mGLProgram,"aPosition");
-        mGLTextureCo=GLES20.glGetAttribLocation(mGLProgram,"aTextureCoord");
-        mGLVertexMatrix=GLES20.glGetUniformLocation(mGLProgram,"uMVPMatrix");
-        mGLTextureMatrix=GLES20.glGetUniformLocation(mGLProgram,"uTexMatrix");
-        mGLTexture=GLES20.glGetUniformLocation(mGLProgram,"sTexture");
+        mGLVertexCo= GLES20.glGetAttribLocation(mGLProgram,"aVertexCo");
+        mGLTextureCo=GLES20.glGetAttribLocation(mGLProgram,"aTextureCo");
+        mGLVertexMatrix=GLES20.glGetUniformLocation(mGLProgram,"uVertexMatrix");
+        mGLTextureMatrix=GLES20.glGetUniformLocation(mGLProgram,"uTextureMatrix");
+        mGLTexture=GLES20.glGetUniformLocation(mGLProgram,"uTexture");
 
         if(isUseSize){
             mGLWidth=GLES20.glGetUniformLocation(mGLProgram,"uWidth");
             mGLHeight=GLES20.glGetUniformLocation(mGLProgram,"uHeight");
         }
+
+        GLES20.glUniformMatrix4fv(this.mGLVertexMatrix, 1, false, this.mVertexMatrix, 0);
+        GLES20.glUniformMatrix4fv(this.mGLTextureMatrix, 1, false, this.mTextureMatrix, 0);
+        GLES20.glVertexAttribPointer(mGLVertexCo,2, GLES20.GL_FLOAT, false, VERTEX_NUM * 2,mVertexBuffer);
+        GLES20.glEnableVertexAttribArray(mGLTextureCo);
+        GLES20.glVertexAttribPointer(mGLTextureCo, 2, GLES20.GL_FLOAT, false, VERTEX_NUM * 2, mTextureBuffer);
+//        GLES20.glVertexAttribPointer(this.maPositionLoc, 2, 5126, false, this.VERTEX_SZ, this.pVertex);
+//        GLES20.glVertexAttribPointer(this.maTextureCoordLoc, 2, 5126, false, this.VERTEX_SZ, this.pTexCoord);
+        GLES20.glEnableVertexAttribArray(mGLVertexCo);
+        GLES20.glEnableVertexAttribArray(mGLTextureCo);
+
+        Log.d(TAG, "-----onCreate----");
     }
 
     protected void onSizeChanged(int width,int height){
+        Log.d(TAG, "-----onSizeChanged----");
 
     }
 
     @Override
     public final void create() {
+        Log.d(TAG, "-----create----");
+
         if(mVertex!=null&&mFragment!=null){
             onCreate();
         }
@@ -169,6 +196,8 @@ public abstract class BaseFilter implements Renderer
 
     @Override
     public void sizeChanged(int width, int height) {
+        Log.d(TAG, "-----sizeChanged----");
+
         this.mWidth=width;
         this.mHeight=height;
         onSizeChanged(width, height);
@@ -176,28 +205,48 @@ public abstract class BaseFilter implements Renderer
     }
 
     @Override
-    public void draw(int texture) {
-        onClear();
-        onUseProgram();
-        onSetExpandData();
-        onBindTexture(texture);
-        onDraw();
+    public void draw(int texId, float[] tex_matrix, int offset) {
+        Log.d(TAG, "-----draw----");
+
+        if (this.mGLProgram >= 0) {
+//            onClear();
+            onUseProgram();
+            onSetExpandData(texId, tex_matrix, offset);
+
+
+
+//            GLES20.glEnableVertexAttribArray(mGLVertexCo);
+//            GLES20.glVertexAttribPointer(mGLVertexCo,2, GLES20.GL_FLOAT, false, 0,mVertexBuffer);
+//            GLES20.glEnableVertexAttribArray(mGLTextureCo);
+//            GLES20.glVertexAttribPointer(mGLTextureCo, 2, GLES20.GL_FLOAT, false, 0, mTextureBuffer);
+//            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);
+//            GLES20.glDisableVertexAttribArray(mGLVertexCo);
+//            GLES20.glDisableVertexAttribArray(mGLTextureCo);
+
+            onDraw(texId);
+
+
+        }
     }
 
     /**
      * 绘制内容到纹理上
-     * @param texture 输入纹理ID
+     * @param texId 输入纹理ID
      * @return 输出纹理ID
      */
-    public int drawToTexture(int texture){
+    public int drawToTexture(int texId, float[] tex_matrix, int offset){
+        Log.d(TAG, "-----drawToTexture----");
+
         mFrameTemp.bindFrameBuffer(mWidth,mHeight);
-        draw(texture);
+        draw(texId, tex_matrix, offset);
         mFrameTemp.unBindFrameBuffer();
         return mFrameTemp.getCacheTextureId();
     }
 
     @Override
     public void destroy() {
+        Log.d(TAG, "-----destroy----");
+
         mFrameTemp.destroyFrameBuffer();
         GLES20.glDeleteProgram(mGLProgram);
     }
@@ -215,14 +264,21 @@ public abstract class BaseFilter implements Renderer
         onTaskExec();
     }
 
-    protected void onDraw(){
-        GLES20.glEnableVertexAttribArray(mGLVertexCo);
-        GLES20.glVertexAttribPointer(mGLVertexCo,2, GLES20.GL_FLOAT, false, 0,mVertexBuffer);
-        GLES20.glEnableVertexAttribArray(mGLTextureCo);
-        GLES20.glVertexAttribPointer(mGLTextureCo, 2, GLES20.GL_FLOAT, false, 0, mTextureBuffer);
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);
-        GLES20.glDisableVertexAttribArray(mGLVertexCo);
-        GLES20.glDisableVertexAttribArray(mGLTextureCo);
+    protected void onDraw(int texId){
+//        GLES20.glEnableVertexAttribArray(mGLVertexCo);
+//        GLES20.glVertexAttribPointer(mGLVertexCo,2, GLES20.GL_FLOAT, false, 0,mVertexBuffer);
+//        GLES20.glEnableVertexAttribArray(mGLTextureCo);
+//        GLES20.glVertexAttribPointer(mGLTextureCo, 2, GLES20.GL_FLOAT, false, 0, mTextureBuffer);
+//        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);
+//        GLES20.glDisableVertexAttribArray(mGLVertexCo);
+//        GLES20.glDisableVertexAttribArray(mGLTextureCo);
+        GLES20.glActiveTexture(33984);
+        GLES20.glBindTexture(this.mTexTarget, texId);
+        GLES20.glDrawArrays(5, 0, this.VERTEX_NUM);
+        GLES20.glBindTexture(this.mTexTarget, 0);
+        GLES20.glUseProgram(0);
+        Log.d(TAG, "-----onDraw----");
+
     }
 
     protected void onClear(){
@@ -239,9 +295,16 @@ public abstract class BaseFilter implements Renderer
     /**
      * 设置其他扩展数据
      */
-    protected void onSetExpandData(){
-        GLES20.glUniformMatrix4fv(mGLVertexMatrix,1,false,mVertexMatrix,0);
-        GLES20.glUniformMatrix4fv(mGLTextureMatrix,1,false,mTextureMatrix,0);
+    protected void onSetExpandData(int texId, float[] tex_matrix, int offset){
+        Log.d(TAG, "-----onSetExpandData----");
+
+//        GLES20.glUniformMatrix4fv(mGLVertexMatrix,1,false,mVertexMatrix,0);
+//        GLES20.glUniformMatrix4fv(mGLTextureMatrix,1,false,mTextureMatrix,0);
+        if (tex_matrix != null) {
+            GLES20.glUniformMatrix4fv(this.mGLTextureMatrix, 1, false, tex_matrix, offset);
+        }
+
+        GLES20.glUniformMatrix4fv(this.mGLVertexMatrix, 1, false, this.mVertexMatrix, 0);
         if(isUseSize){
             GLES20.glUniform1f(mGLWidth,mWidth);
             GLES20.glUniform1f(mGLHeight,mHeight);
@@ -255,6 +318,8 @@ public abstract class BaseFilter implements Renderer
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,textureId);
         GLES20.glUniform1i(mGLTexture,0);
+        Log.d(TAG, "-----onBindTexture----");
+
     }
 
 }

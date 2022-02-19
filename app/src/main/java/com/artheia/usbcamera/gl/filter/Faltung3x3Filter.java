@@ -29,8 +29,8 @@ public class Faltung3x3Filter extends BaseFilter {
     }
 
     @Override
-    protected void onSetExpandData() {
-        super.onSetExpandData();
+    protected void onSetExpandData(int texId, float[] tex_matrix, int offset) {
+        super.onSetExpandData(texId, tex_matrix, offset);
         GLES20.glUniformMatrix3fv(mGLFaltung,1,false,mFaltung,0);
     }
 }

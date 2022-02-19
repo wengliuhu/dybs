@@ -21,7 +21,7 @@ import android.content.res.Resources;
  * @author wuwang
  * @version v1.0 2017:10:31 11:47
  */
- class BaseFuncFilter extends BaseFilter {
+class BaseFuncFilter extends BaseFilter {
 
     static final String FILTER_SOBEL="shader/func/sobel.frag";
     static final String FILTER_SOBEL_REVERSE="shader/func/sobel2.frag";
