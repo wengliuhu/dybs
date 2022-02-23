@@ -16,10 +16,10 @@ package com.artheia.usbcamera.gl.filter;
 import android.content.res.Resources;
 
 /**
- * BlackMagicFilter 黑魔法滤镜，sobel算法实现
- *
- * @author wuwang
- * @version v1.0 2017:10:31 11:47
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:13
+ * Describe：黑魔法滤镜，sobel算法实现
  */
 public class BlackMagicFilter extends GroupFilter {
 
@@ -31,6 +31,7 @@ public class BlackMagicFilter extends GroupFilter {
     protected void initBuffer() {
         super.initBuffer();
         addFilter(new GrayFilter(mRes));
+        addFilter(new BaseFuncFilter(mRes, BaseFuncFilter.FILTER_GAUSS));
         addFilter(new BaseFuncFilter(mRes, BaseFuncFilter.FILTER_SOBEL));
     }
 }

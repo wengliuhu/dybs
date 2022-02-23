@@ -17,10 +17,10 @@ import android.content.res.Resources;
 import android.opengl.GLES20;
 
 /**
- * RollFilter 四分屏转动滤镜
- *
- * @author wuwang
- * @version v1.0 2017:10:31 11:54
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:15
+ * Describe：四分屏转动滤镜
  */
 public class RollFilter extends LazyFilter {
 

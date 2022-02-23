@@ -52,6 +52,7 @@ public class MyGlDrawer implements IDrawer2dES2 {
         this.VERTEX_NUM = Math.min(vertices != null ? vertices.length : 0, texcoord != null ? texcoord.length : 0) / 2;
         this.VERTEX_SZ = this.VERTEX_NUM * 2;
         this.mTexTarget = isOES ? '赥' : 3553;
+        // 分配32个字节
         this.pVertex = ByteBuffer.allocateDirect(this.VERTEX_SZ * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
         this.pVertex.put(vertices);
         this.pVertex.flip();

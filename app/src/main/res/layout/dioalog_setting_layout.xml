@@ -208,6 +208,38 @@
                         android:tag="@{DATA.REVERSE}"
                         android:textColor="@color/radiobutton_select"
                         android:text="反色"/>
+
+                    <RadioButton
+                        android:id="@+id/rb_white_border"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:tag="@{DATA.WHITE_BORDER}"
+                        android:textColor="@color/radiobutton_select"
+                        android:text="白色描边"/>
+
+                    <RadioButton
+                        android:id="@+id/rb_black_border"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:tag="@{DATA.BLACK_BORDER}"
+                        android:textColor="@color/radiobutton_select"
+                        android:text="黑色描边"/>
+
+                    <RadioButton
+                        android:id="@+id/rb_color_green_border"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:tag="@{DATA.ALL_COLOR_GREEN_BORDER}"
+                        android:textColor="@color/radiobutton_select"
+                        android:text="全彩绿边"/>
+
+                    <RadioButton
+                        android:id="@+id/rb_color_yellow_border"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:tag="@{DATA.ALL_COLOR_YELLOW_BORDER}"
+                        android:textColor="@color/radiobutton_select"
+                        android:text="全彩黄边"/>
                 </RadioGroup>
             </HorizontalScrollView>
 

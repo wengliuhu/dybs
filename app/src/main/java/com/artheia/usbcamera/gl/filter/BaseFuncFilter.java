@@ -15,19 +15,20 @@ package com.artheia.usbcamera.gl.filter;
 
 import android.content.res.Resources;
 
+
 /**
- * BaseFuncFilter 基础功能滤镜
- *
- * @author wuwang
- * @version v1.0 2017:10:31 11:47
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:12
+ * Describe：基础功能滤镜
  */
-class BaseFuncFilter extends BaseFilter {
+public class BaseFuncFilter extends BaseFilter {
 
     static final String FILTER_SOBEL="shader/func/sobel.frag";
     static final String FILTER_SOBEL_REVERSE="shader/func/sobel2.frag";
     static final String FILTER_GAUSS="shader/func/gauss.frag";
 
-    BaseFuncFilter(Resources resource, String fragment) {
+    public BaseFuncFilter(Resources resource, String fragment) {
         super(resource, "shader/base.vert", fragment);
         shaderNeedTextureSize(true);
     }

@@ -144,10 +144,11 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        Looper.prepare();
+//                        Looper.prepare();
                         if(mCameraHelper != null && mCameraHelper.isCameraOpened()) {
                             runOnUiThread(mFpsTask);
                             //2021.10.19 14：30添加
+                            // 缩放矩阵
                             mMatrix = new Matrix(mUVCCameraView.getMatrix());
                             int scale = ConfigBean.getInstance().getScale();
                             int light = ConfigBean.getInstance().getBrightness();
@@ -166,7 +167,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                             // 自动聚焦
                             mCameraHelper.startCameraFoucs();
                         }
-                        Looper.loop();
+//                        Looper.loop();
                     }
                 }).start();
             }
@@ -239,7 +240,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                 TtsSpeaker.getInstance().addMessageFlush("[p1500]" + (showProcess > 0 ? "放大 " : "缩小") + Math.abs(showProcess) + "倍");
             }
         });
-
+        // 初始化ocr
         OcrHelper.getInstance().initAccessTokenWithAkSk(this);
     }
 
@@ -348,41 +349,10 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
-        Log.d(TAG, "-----onTouchEvent----" + event.getAction());
+//        Log.d(TAG, "-----onTouchEvent----" + event.getAction());
         if (event.getAction() == MotionEvent.ACTION_UP){
             if (SystemClock.uptimeMillis() - lastClickTime < 600){
                 Log.d(TAG, "-----onTouchEvent---capturePicture-");
-
-         /*       // TODO: 2022/2/15 测试OCR
-                String filePath = FileUtils.getSaveImagePath() + "a.jpg";
-                // TODO: 2022/2/13 开始OCR识别
-                RecognizeService.recognizeGeneralBasic(USBCameraActivity.this, filePath,
-                        new RecognizeService.ServiceListener() {
-                            @Override
-                            public void onResult(String result) {
-                                Log.d(TAG, result);
-//                                Toast.makeText(USBCameraActivity.this, "识别图片成功：" + result, Toast.LENGTH_LONG).show();
-                                Gson gson = new Gson();
-                                OcrResult ocrResult = gson.fromJson(result, OcrResult.class);
-                                if (ocrResult == null){
-                                    Toast.makeText(USBCameraActivity.this, "识别图片失败：" + result, Toast.LENGTH_LONG).show();
-                                    return;
-                                }
-                                StringBuffer buffer = new StringBuffer();
-                                if (ocrResult.getWords_result() != null){
-                                    Iterator<OcrResult.WordsResult> iterator = ocrResult.getWords_result().iterator();
-                                    while (iterator.hasNext()){
-                                        buffer.append(iterator.next().getWords());
-                                    }
-                                }
-                                if (!TextUtils.isEmpty(buffer.toString())){
-                                    TtsSpeaker.getInstance().addMessageFlush(buffer.toString());
-                                }else {
-                                    Toast.makeText(USBCameraActivity.this, "未识别到文字!", Toast.LENGTH_LONG).show();
-                                }
-
-                            }
-                        });*/
                 // 开始截图
                 String fileName = System.currentTimeMillis() + ".jpg";
                 mCameraHelper.capturePicture(FileUtils.getSaveImagePath() + fileName, new AbstractUVCCameraHandler.OnCaptureListener() {
@@ -523,7 +493,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                         case AppConstant.COLOR_RESET:
                             mCameraHelper.resetModelValue(UVCCameraHelper.MODE_CONTRAST);
                             mCameraHelper.resetModelValue(UVCCameraHelper.MODE_BRIGHTNESS);
-                            mUVCCameraView.changeGray(false);
+                            mUVCCameraView.changeOriginal();
                             if (mSettingDialog != null) {
                                 mSettingDialog.updateScale(AppConstant.CONFIG_SCALE);
                             }
@@ -547,7 +517,7 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                         }
                         case DATA.GRAY:
                         {
-                            mUVCCameraView.changeGray(true);
+                            mUVCCameraView.changeGray();
                             break;
                         }
                         case DATA.BRIGHT_YELLOW:
@@ -568,6 +538,26 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                         case DATA.LIGHT_TEA:
                         {
                             mUVCCameraView.changeLightTea();
+                            break;
+                        }
+                        case DATA.WHITE_BORDER:
+                        {
+                            mUVCCameraView.changeWhiteBorder();
+                            break;
+                        }
+                        case DATA.BLACK_BORDER:
+                        {
+                            mUVCCameraView.changeBlackBorder();
+                            break;
+                        }
+                        case DATA.ALL_COLOR_GREEN_BORDER:
+                        {
+                            mUVCCameraView.changeColorGreenBorder();
+                            break;
+                        }
+                        case DATA.ALL_COLOR_YELLOW_BORDER:
+                        {
+                            mUVCCameraView.changeColorYellowBorder();
                             break;
                         }
                     }

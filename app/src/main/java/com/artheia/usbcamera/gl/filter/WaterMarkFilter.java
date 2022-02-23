@@ -19,12 +19,11 @@ import android.opengl.GLUtils;
 
 import com.artheia.usbcamera.gl.utils.GpuUtils;
 
-
 /**
- * WaterMarkFilter
- *
- * @author wuwang
- * @version v1.0 2017:11:06 14:10
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:17
+ * Describe：
  */
 public class WaterMarkFilter extends LazyFilter{
 

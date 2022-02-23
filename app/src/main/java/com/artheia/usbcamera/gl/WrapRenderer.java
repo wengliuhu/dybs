@@ -14,8 +14,12 @@
 package com.artheia.usbcamera.gl;
 
 
+import android.graphics.SurfaceTexture;
+
 import com.artheia.usbcamera.gl.core.Renderer;
 import com.artheia.usbcamera.gl.filter.OesFilter;
+import com.artheia.usbcamera.gl.utils.GpuUtils;
+import com.serenegiant.glutils.GLHelper;
 
 /**
  * WrapRenderer 用于包装其他Filter渲染OES纹理
@@ -31,11 +35,23 @@ public class WrapRenderer implements Renderer
 
     public static final int TYPE_MOVE=0;
     public static final int TYPE_CAMERA=1;
+    private final int mTexTarget;
 
     public WrapRenderer(Renderer renderer){
         this.mRenderer=renderer;
         mFilter=new OesFilter();
-        setFlag(TYPE_MOVE);
+        mTexTarget = '赥';
+        setFlag(TYPE_CAMERA);
+    }
+
+    public int createTexId(int oldTexId){
+        if (oldTexId > 0)
+            GLHelper.deleteTex(oldTexId);
+        return GLHelper.initTex(this.mTexTarget, 9728);
+//        SurfaceTexture temp = new SurfaceTexture(0);
+//        EglHelper helper = new EglHelper();
+//        helper.createGLESWithSurface(new EGLConfigAttrs(),new EGLContextAttrs(),temp);
+//        return GpuUtils.createTextureID(true);
     }
 
     public void setFlag(int flag){
@@ -47,10 +63,16 @@ public class WrapRenderer implements Renderer
                     1.0f,-1.0f,
             });
         }else if(flag==TYPE_CAMERA){
-            mFilter.setVertexCo(new float[]{
+     /*       mFilter.setVertexCo(new float[]{
                     -1.0f, -1.0f,
                     1.0f, -1.0f,
                     -1.0f, 1.0f,
+                    1.0f, 1.0f,
+            });*/
+            mFilter.setVertexCo(new float[]{
+                    -1.0f, -1.0f,
+                    -1.0f, 1.0f,
+                    1.0f, -1.0f,
                     1.0f, 1.0f,
             });
         }
@@ -75,6 +97,7 @@ public class WrapRenderer implements Renderer
             mRenderer.sizeChanged(width, height);
         }
     }
+
 
     @Override
     public void draw(int texId, float[] tex_matrix, int offset)

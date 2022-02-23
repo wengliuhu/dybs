@@ -908,7 +908,7 @@ public abstract class AbstractUVCCameraHandler extends Handler {
 
         // 自动对焦
         public void handleCameraFoucs() {
-            if (DEBUG) Log.v(TAG_THREAD, "handleStartPreview:");
+            if (DEBUG) Log.v(TAG_THREAD, "handleCameraFoucs:");
             if ((mUVCCamera == null) || !mIsPreviewing)
                 return;
             mUVCCamera.setAutoFocus(true);

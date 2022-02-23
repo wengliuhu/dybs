@@ -28,14 +28,15 @@ import java.nio.FloatBuffer;
 import java.util.LinkedList;
 
 /**
- * BaseFilter 滤镜的基类。对于滤镜而言，要求使用者外部调用的时候必须调用的方法为
- * {@link #create()}、{@link #sizeChanged(int, int)}以及{@link #draw(int, float[], int)}或者
- * {@link #drawToTexture(int, float[], int)} )}。
- * 在实现Filter子类时，通常需要自行编写shader，shader中的变量应同assets下base.frag及
- * base.vert中变量一致，可以增加。增加的变量需要重写{@link #onCreate()}方法，在其中
- * 获取变量用于传参。
- * @author wuwang
- * @version v1.0 2017:10:31 10:48
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:11
+ * Describe：BaseFilter 滤镜的基类。对于滤镜而言，要求使用者外部调用的时候必须调用的方法为
+ *  {@link #create()}、{@link #sizeChanged(int, int)}以及{@link #draw(int, float[], int)}或者
+ *  {@link #drawToTexture(int, float[], int)} )}。
+ *  在实现Filter子类时，通常需要自行编写shader，shader中的变量应同assets下base.frag及
+ *  base.vert中变量一致，可以增加。增加的变量需要重写{@link #onCreate()}方法，在其中
+ *  获取变量用于传参。
  */
 public abstract class   BaseFilter implements Renderer {
     private final String TAG = getClass().toString();
@@ -80,7 +81,7 @@ public abstract class   BaseFilter implements Renderer {
     private final LinkedList<Runnable> mTasks=new LinkedList<>();
     private final Object Lock = new Object();
 
-    private final int mTexTarget;
+//    private final int mTexTarget;
     private final int VERTEX_NUM = 16;
 
     protected BaseFilter(Resources resource,String vertex,String fragment){
@@ -88,8 +89,6 @@ public abstract class   BaseFilter implements Renderer {
         this.mVertex=vertex;
         this.mFragment=fragment;
         mFrameTemp=new FrameBuffer();
-        // 开启oes
-        this.mTexTarget ='赥';
         initBuffer();
     }
 
@@ -106,9 +105,9 @@ public abstract class   BaseFilter implements Renderer {
         mTextureBuffer.position(0);
     }
 
-    public boolean isOES() {
-        return this.mTexTarget == 36197;
-    }
+//    public boolean isOES() {
+//        return this.mTexTarget == 36197;
+//    }
 
     public void setVertexCo(float[] vertexCo){
         mVertexBuffer.clear();
@@ -170,24 +169,21 @@ public abstract class   BaseFilter implements Renderer {
         GLES20.glUniformMatrix4fv(this.mGLVertexMatrix, 1, false, this.mVertexMatrix, 0);
         GLES20.glUniformMatrix4fv(this.mGLTextureMatrix, 1, false, this.mTextureMatrix, 0);
         GLES20.glVertexAttribPointer(mGLVertexCo,2, GLES20.GL_FLOAT, false, VERTEX_NUM * 2,mVertexBuffer);
-        GLES20.glEnableVertexAttribArray(mGLTextureCo);
         GLES20.glVertexAttribPointer(mGLTextureCo, 2, GLES20.GL_FLOAT, false, VERTEX_NUM * 2, mTextureBuffer);
-//        GLES20.glVertexAttribPointer(this.maPositionLoc, 2, 5126, false, this.VERTEX_SZ, this.pVertex);
-//        GLES20.glVertexAttribPointer(this.maTextureCoordLoc, 2, 5126, false, this.VERTEX_SZ, this.pTexCoord);
         GLES20.glEnableVertexAttribArray(mGLVertexCo);
         GLES20.glEnableVertexAttribArray(mGLTextureCo);
+//        Log.d(TAG, "-----onCreate-----:mGLProgram" + mGLProgram);
 
-        Log.d(TAG, "-----onCreate----");
     }
 
     protected void onSizeChanged(int width,int height){
-        Log.d(TAG, "-----onSizeChanged----");
+//        Log.d(TAG, "-----onSizeChanged----:mGLProgram" + mGLProgram);
 
     }
 
     @Override
     public final void create() {
-        Log.d(TAG, "-----create----");
+//        Log.d(TAG, "-----create----");
 
         if(mVertex!=null&&mFragment!=null){
             onCreate();
@@ -196,7 +192,7 @@ public abstract class   BaseFilter implements Renderer {
 
     @Override
     public void sizeChanged(int width, int height) {
-        Log.d(TAG, "-----sizeChanged----");
+//        Log.d(TAG, "-----sizeChanged----");
 
         this.mWidth=width;
         this.mHeight=height;
@@ -206,26 +202,14 @@ public abstract class   BaseFilter implements Renderer {
 
     @Override
     public void draw(int texId, float[] tex_matrix, int offset) {
-        Log.d(TAG, "-----draw----");
+//        Log.d(TAG, "-----draw----");
 
         if (this.mGLProgram >= 0) {
-//            onClear();
+            onClear();
             onUseProgram();
             onSetExpandData(texId, tex_matrix, offset);
-
-
-
-//            GLES20.glEnableVertexAttribArray(mGLVertexCo);
-//            GLES20.glVertexAttribPointer(mGLVertexCo,2, GLES20.GL_FLOAT, false, 0,mVertexBuffer);
-//            GLES20.glEnableVertexAttribArray(mGLTextureCo);
-//            GLES20.glVertexAttribPointer(mGLTextureCo, 2, GLES20.GL_FLOAT, false, 0, mTextureBuffer);
-//            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);
-//            GLES20.glDisableVertexAttribArray(mGLVertexCo);
-//            GLES20.glDisableVertexAttribArray(mGLTextureCo);
-
+            onBindTexture(texId);
             onDraw(texId);
-
-
         }
     }
 
@@ -236,7 +220,6 @@ public abstract class   BaseFilter implements Renderer {
      */
     public int drawToTexture(int texId, float[] tex_matrix, int offset){
         Log.d(TAG, "-----drawToTexture----");
-
         mFrameTemp.bindFrameBuffer(mWidth,mHeight);
         draw(texId, tex_matrix, offset);
         mFrameTemp.unBindFrameBuffer();
@@ -245,7 +228,7 @@ public abstract class   BaseFilter implements Renderer {
 
     @Override
     public void destroy() {
-        Log.d(TAG, "-----destroy----");
+        Log.d(TAG, "-----destroy---mGLProgram:" + mGLProgram);
 
         mFrameTemp.destroyFrameBuffer();
         GLES20.glDeleteProgram(mGLProgram);
@@ -265,19 +248,15 @@ public abstract class   BaseFilter implements Renderer {
     }
 
     protected void onDraw(int texId){
-//        GLES20.glEnableVertexAttribArray(mGLVertexCo);
-//        GLES20.glVertexAttribPointer(mGLVertexCo,2, GLES20.GL_FLOAT, false, 0,mVertexBuffer);
-//        GLES20.glEnableVertexAttribArray(mGLTextureCo);
-//        GLES20.glVertexAttribPointer(mGLTextureCo, 2, GLES20.GL_FLOAT, false, 0, mTextureBuffer);
-//        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);
-//        GLES20.glDisableVertexAttribArray(mGLVertexCo);
-//        GLES20.glDisableVertexAttribArray(mGLTextureCo);
-        GLES20.glActiveTexture(33984);
-        GLES20.glBindTexture(this.mTexTarget, texId);
-        GLES20.glDrawArrays(5, 0, this.VERTEX_NUM);
-        GLES20.glBindTexture(this.mTexTarget, 0);
-        GLES20.glUseProgram(0);
         Log.d(TAG, "-----onDraw----");
+        GLES20.glEnableVertexAttribArray(mGLVertexCo);
+        GLES20.glVertexAttribPointer(mGLVertexCo,2, GLES20.GL_FLOAT, false, 0,mVertexBuffer);
+        GLES20.glEnableVertexAttribArray(mGLTextureCo);
+        GLES20.glVertexAttribPointer(mGLTextureCo, 2, GLES20.GL_FLOAT, false, 0, mTextureBuffer);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);
+        GLES20.glDisableVertexAttribArray(mGLVertexCo);
+        GLES20.glDisableVertexAttribArray(mGLTextureCo);
+
 
     }
 
@@ -298,13 +277,13 @@ public abstract class   BaseFilter implements Renderer {
     protected void onSetExpandData(int texId, float[] tex_matrix, int offset){
         Log.d(TAG, "-----onSetExpandData----");
 
-//        GLES20.glUniformMatrix4fv(mGLVertexMatrix,1,false,mVertexMatrix,0);
+        GLES20.glUniformMatrix4fv(mGLVertexMatrix,1,false,mVertexMatrix,0);
 //        GLES20.glUniformMatrix4fv(mGLTextureMatrix,1,false,mTextureMatrix,0);
         if (tex_matrix != null) {
             GLES20.glUniformMatrix4fv(this.mGLTextureMatrix, 1, false, tex_matrix, offset);
         }
-
-        GLES20.glUniformMatrix4fv(this.mGLVertexMatrix, 1, false, this.mVertexMatrix, 0);
+//
+//        GLES20.glUniformMatrix4fv(this.mGLVertexMatrix, 1, false, this.mVertexMatrix, 0);
         if(isUseSize){
             GLES20.glUniform1f(mGLWidth,mWidth);
             GLES20.glUniform1f(mGLHeight,mHeight);
@@ -318,7 +297,7 @@ public abstract class   BaseFilter implements Renderer {
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,textureId);
         GLES20.glUniform1i(mGLTexture,0);
-        Log.d(TAG, "-----onBindTexture----");
+//        Log.d(TAG, "-----onBindTexture----");
 
     }
 

@@ -16,10 +16,10 @@ package com.artheia.usbcamera.gl.filter;
 import java.nio.FloatBuffer;
 
 /**
- * ProxyFilter
- *
- * @author wuwang
- * @version v1.0 2017:11:11 11:48
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:15
+ * Describe：
  */
 public class ProxyFilter extends BaseFilter {
 

@@ -22,10 +22,10 @@ import com.artheia.usbcamera.gl.utils.MatrixUtils;
 import java.nio.ByteBuffer;
 
 /**
- * YuvOutputFilter
- *
- * @author wuwang
- * @version v1.0 2017:11:10 12:18
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:17
+ * Describe：
  */
 public class YuvOutputFilter extends BaseFilter {
 

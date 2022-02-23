@@ -10,6 +10,12 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.os.Build;
 
+/**
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:15
+ * Describe：
+ */
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
 public class OesFilter extends BaseFilter {
 

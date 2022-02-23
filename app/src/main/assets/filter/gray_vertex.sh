@@ -1,10 +1,10 @@
 #version 100
 uniform mat4 uMVPMatrix;
 uniform mat4 uTexMatrix;
-attribute highp vec4 aPosition;
-attribute highp vec4 aTextureCoord;
-varying highp vec2 vTextureCoord;
+attribute vec4 aVertexCo;
+attribute vec2 aTextureCo;
+varying highp vec2 vTextureCo;
 void main() {
- gl_Position = uMVPMatrix * aPosition;
- vTextureCoord = (uTexMatrix * aTextureCoord).xy;
+ gl_Position = uMVPMatrix * aVertexCo;
+ vTextureCo = (uTexMatrix * aTextureCo).xy;
 }

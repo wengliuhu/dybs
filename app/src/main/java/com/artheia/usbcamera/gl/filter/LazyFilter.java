@@ -16,10 +16,10 @@ package com.artheia.usbcamera.gl.filter;
 import android.content.res.Resources;
 
 /**
- * LazyFilter 绘制原始纹理的Filter,通过矩阵提供旋转缩放等功能
- *
- * @author wuwang
- * @version v1.0 2017:10:31 11:42
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:15
+ * Describe：绘制原始纹理的Filter,通过矩阵提供旋转缩放等功能
  */
 public class LazyFilter extends BaseFilter {
 

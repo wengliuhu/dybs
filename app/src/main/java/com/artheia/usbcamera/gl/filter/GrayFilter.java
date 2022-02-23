@@ -14,12 +14,11 @@
 package com.artheia.usbcamera.gl.filter;
 
 import android.content.res.Resources;
-
 /**
- * GrayFilter 灰度滤镜
- *
- * @author wuwang
- * @version v1.0 2017:10:31 11:52
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:14
+ * Describe：灰度滤镜
  */
 public class GrayFilter extends BaseFilter {
 

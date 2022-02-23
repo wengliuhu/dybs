@@ -16,10 +16,10 @@ package com.artheia.usbcamera.gl.filter;
 import android.opengl.GLES20;
 
 /**
- * FrameBuffer 工具类
- *
- * @author wuwang
- * @version v1.0 2017:10:31 10:31
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:14
+ * Describe：工具类
  */
 public class FrameBuffer {
 

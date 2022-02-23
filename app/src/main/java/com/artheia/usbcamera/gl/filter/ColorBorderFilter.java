@@ -1,16 +1,3 @@
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *  
- *      http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.artheia.usbcamera.gl.filter;
 
 import android.content.res.Resources;
@@ -19,10 +6,10 @@ import android.opengl.GLES20;
 /**
  * @author : wengliuhu
  * @version : 0.1
- * @since : 2022-02-22 14:14
- * Describe：荧光滤镜
+ * @since : 2022/2/22 16:09
+ * Describe：
  */
-public class FluorescenceFilter extends BaseFilter {
+public class ColorBorderFilter extends BaseFilter {
 
     private int mGLTexture2;
     private int mGLBorderColor;
@@ -30,23 +17,36 @@ public class FluorescenceFilter extends BaseFilter {
     private BlackMagicFilter mBlackFilter;
     private int mTempTexture;
     private float[] mBorderColor=new float[]{0f,1f,1f,1};
-    private float mStep=1.0f;
+    private float mStep=1.8f;
 
     private boolean isAdd=true;
 
-    public FluorescenceFilter(Resources resource) {
+    public ColorBorderFilter(Resources resource, float[] color) {
         super(resource, "shader/base.vert", "shader/effect/fluorescence.frag");
         shaderNeedTextureSize(true);
         mBlackFilter=new BlackMagicFilter(resource);
+        mBorderColor = color;
     }
 
     @Override
     protected void onCreate() {
+        setVertexCo(new float[]{
+                -1.0f, 1.0f,
+                -1.0f, -1.0f,
+                1.0f, 1.0f,
+                1.0f, -1.0f,
+        });
         mBlackFilter.create();
         super.onCreate();
         mGLTexture2= GLES20.glGetUniformLocation(mGLProgram,"uTexture2");
         mGLBorderColor= GLES20.glGetUniformLocation(mGLProgram,"uBorderColor");
         mGLStep=GLES20.glGetUniformLocation(mGLProgram,"uStep");
+    }
+
+    @Override
+    protected void initBuffer()
+    {
+        super.initBuffer();
     }
 
     @Override
@@ -75,7 +75,7 @@ public class FluorescenceFilter extends BaseFilter {
     protected void onSetExpandData(int texId, float[] tex_matrix, int offset) {
         //todo 根据时间修改
 
-        if(isAdd){
+       /* if(isAdd){
             mStep+=0.08f;
         }else{
             mStep-=0.08f;
@@ -87,10 +87,9 @@ public class FluorescenceFilter extends BaseFilter {
         }else if(mStep<=0.0f){
             isAdd=true;
             mStep=0.0f;
-        }
+        }*/
         super.onSetExpandData(texId, tex_matrix, offset);
 
         GLES20.glUniform4fv(mGLBorderColor,1,mBorderColor,0);
         GLES20.glUniform1f(mGLStep,mStep);
-    }
-}
+    }}

@@ -4,9 +4,11 @@ import android.content.res.Resources;
 import android.opengl.GLES20;
 
 /**
- * Created by wuwang on 2017/10/1.
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:13
+ * Describe：
  */
-
 public class Faltung3x3Filter extends BaseFilter {
 
     private float[] mFaltung;

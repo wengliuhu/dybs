@@ -6,9 +6,11 @@ import android.opengl.GLES20;
 import java.nio.ByteBuffer;
 
 /**
- * Created by aiya on 2017/9/23.
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:16
+ * Describe：
  */
-
 public class WaterColorFilter extends BaseFilter {
 
     private int mGLWidth;

@@ -17,10 +17,10 @@ import android.content.res.Resources;
 import android.opengl.GLES20;
 
 /**
- * BeautyFilter 美颜滤镜
- *
- * @author wuwang
- * @version v1.0 2017:10:31 11:46
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:13
+ * Describe：美颜滤镜
  */
 public class BeautyFilter extends BaseFilter {
 
@@ -42,6 +42,12 @@ public class BeautyFilter extends BaseFilter {
     @Override
     protected void onCreate() {
         super.onCreate();
+        setVertexCo(new float[]{
+                -1.0f, 1.0f,
+                -1.0f, -1.0f,
+                1.0f, 1.0f,
+                1.0f, -1.0f,
+        });
         mGLaaCoef= GLES20.glGetUniformLocation(mGLProgram,"uACoef");
         mGLmixCoef=GLES20.glGetUniformLocation(mGLProgram,"uMixCoef");
         mGLiternum=GLES20.glGetUniformLocation(mGLProgram,"uIternum");

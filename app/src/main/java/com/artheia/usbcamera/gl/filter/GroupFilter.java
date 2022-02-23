@@ -19,10 +19,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * GroupFilter 滤镜组，将多个滤镜串联起来，合并成一个滤镜
- *
- * @author wuwang
- * @version v1.0 2017:10:31 11:53
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-22 14:14
+ * Describe：滤镜组，将多个滤镜串联起来，合并成一个滤镜
  */
 public class GroupFilter extends LazyFilter {
 

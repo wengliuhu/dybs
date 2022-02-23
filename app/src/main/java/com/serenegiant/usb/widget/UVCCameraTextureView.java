@@ -26,6 +26,7 @@ package com.serenegiant.usb.widget;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
+import android.opengl.GLES20;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -37,13 +38,18 @@ import android.view.TextureView;
 
 import com.artheia.usbcamera.application.MyApplication;
 import com.artheia.usbcamera.gl.CusGlDrawer;
-import com.artheia.usbcamera.gl.MyGlDrawer;
-import com.artheia.usbcamera.gl.WrapRenderer;
-import com.artheia.usbcamera.gl.filter.BaseFilter;
-import com.artheia.usbcamera.gl.filter.CandyFilter;
-import com.artheia.usbcamera.utils.ShaderUtils;
+import com.artheia.usbcamera.gl.core.Renderer;
+import com.artheia.usbcamera.gl.filter.BaseFuncFilter;
+import com.artheia.usbcamera.gl.filter.BeautyFilter;
+import com.artheia.usbcamera.gl.filter.BlackBorderFilter;
+import com.artheia.usbcamera.gl.filter.BlackMagicFilter;
+import com.artheia.usbcamera.gl.filter.ColorBorderFilter;
+import com.artheia.usbcamera.gl.filter.Faltung3x3Filter;
+import com.artheia.usbcamera.gl.filter.FluorescenceFilter;
+import com.artheia.usbcamera.gl.filter.WaterColorFilter;
+import com.artheia.usbcamera.gl.filter.WaterMarkFilter;
+import com.artheia.usbcamera.gl.filter.WhiteBorderFilter;
 import com.serenegiant.glutils.EGLBase;
-import com.serenegiant.glutils.GLDrawer2D;
 import com.serenegiant.glutils.es1.GLHelper;
 import com.serenegiant.usb.encoder.IVideoEncoder;
 import com.serenegiant.usb.encoder.MediaEncoder;
@@ -70,6 +76,13 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	private Callback mCallback;
 	// Camera分辨率宽度
 
+/*	private SurfaceTexture mSurfaceTexture;
+	private int mSurfaceTextureId;
+	private void createSurfaceTexture(){
+		if (mSurfaceTexture != null) mSurfaceTexture.release();
+		mSurfaceTextureId= GpuUtils.createTextureID(true);
+		mSurfaceTexture = new SurfaceTexture(mSurfaceTextureId);
+	}*/
 
 	/** for calculation of frame rate */
 	private final FpsCounter mFpsCounter = new FpsCounter();
@@ -112,6 +125,8 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
 		if (DEBUG) Log.i(TAG, "onSurfaceTextureAvailable:" + surface);
 		if (mRenderHandler == null) {
+			// 创建自己的surfaceTexture
+//			createSurfaceTexture();
 			mRenderHandler = RenderHandler.createHandler(mFpsCounter, surface, width, height);
 		} else {
 			mRenderHandler.resize(width, height);
@@ -312,7 +327,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 			}
 		}
 
-		public void updateShader(String vs, String fs) {
+/*		public void updateShader(String vs, String fs) {
 			if (DEBUG) Log.v(TAG, "updateShader:");
 			if (mIsActive) {
 				synchronized (mThread.mSync) {
@@ -320,6 +335,19 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 					Bundle bundle = new Bundle();
 					bundle.putString("vs", vs);
 					bundle.putString("fs", fs);
+					message.setData(bundle);
+					sendMessage(message);
+				}
+			}
+		}*/
+
+		public void updateShader(Renderer renderer) {
+			if (DEBUG) Log.v(TAG, "updateShader:");
+			if (mIsActive) {
+				synchronized (mThread.mSync) {
+					Message message = obtainMessage(MSG_UPDATE_SHADER);
+					Bundle bundle = new Bundle();
+					bundle.putSerializable("renderer", renderer);
 					message.setData(bundle);
 					sendMessage(message);
 				}
@@ -364,15 +392,15 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 				Looper.myLooper().quit();
 				mThread = null;
 				break;
-				case MSG_UPDATE_SHADER: {
-					String vsStr = msg.getData().getString("vs");
-					String fsStr = msg.getData().getString("fs");
-					BaseFilter filter = new BaseFilter(MyApplication.getAPP().getResources(), vsStr, fsStr) {
-
-					};
-					mThread.updateShader(vsStr, fsStr);
-					break;
+			case MSG_UPDATE_SHADER: {
+				String vsStr = msg.getData().getString("vs");
+				String fsStr = msg.getData().getString("fs");
+				Object  rendererObj = msg.getData().getSerializable("renderer");
+				if (rendererObj instanceof Renderer){
+					mThread.updateShader((Renderer) rendererObj);
 				}
+				break;
+			}
 			default:
 				super.handleMessage(msg);
 			}
@@ -386,7 +414,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	    	/** IEglSurface instance related to this TextureView */
 	    	private EGLBase.IEglSurface mEglSurface;
 			// TODO: 2022/2/18 替换成组合滤镜
-	    	private GLDrawer2D mDrawer;
+	    	private CusGlDrawer mDrawer;
 	    	private int mTexId = -1;
 	    	/** SurfaceTexture instance to receive video images */
 	    	private SurfaceTexture mPreviewSurface;
@@ -442,12 +470,18 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	            		mPreviewSurface = null;
 	            	}
 					mEglSurface.makeCurrent();
-		            if (mTexId >= 0) {
+					// TODO: 2022/2/21 modify
+		           /* if (mTexId >= 0) {
 						mDrawer.deleteTex(mTexId);
 		            }
 		    		// create texture and SurfaceTexture for input from camera
-		            mTexId = mDrawer.initTex();
-		            if (DEBUG) Log.v(TAG, "updatePreviewSurface:tex_id=" + mTexId);
+		            mTexId = mDrawer.initTex();*/
+		           // 把其他滤镜的纹理销毁
+		          	mDrawer.sizeChanged(mViewWidth, mViewHeight);
+		          	// 创建新的纹理
+		          	mTexId = mDrawer.createTexId(mTexId);
+
+		            if (DEBUG) Log.v(TAG, "-------------updatePreviewSurface:tex_id=" + mTexId);
 		            mPreviewSurface = new SurfaceTexture(mTexId);
 					mPreviewSurface.setDefaultBufferSize(mViewWidth, mViewHeight);
 		            mPreviewSurface.setOnFrameAvailableListener(mHandler);
@@ -486,8 +520,11 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 			 */
 			public final void onDrawFrame() {
 				mEglSurface.makeCurrent();
+//				GLES20.glClearColor(0,1,0,1);
+//				GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 				// update texture(came from camera)
 				mPreviewSurface.updateTexImage();
+
 				// get texture matrix
 				mPreviewSurface.getTransformMatrix(mStMatrix);
 				// notify video encoder if it exist
@@ -575,10 +612,8 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 				return bitmap;
 			} */
 
-			public void updateShader(String vsStr, String fsStr){
-//				mDrawer.updateShader(new BaseFilter(MyApplication.getAPP().getResources(), vsStr, fsStr) {
-//				});
-				mDrawer.updateShader(vsStr, fsStr);
+			public void updateShader(Renderer renderer){
+				mDrawer.updateShader(renderer, mViewWidth, mViewHeight);
 			}
 
 			@Override
@@ -608,10 +643,9 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	    		mEglSurface = mEgl.createFromSurface(mSurface);
 	    		mEglSurface.makeCurrent();
 	    		// create drawing object
-	    		mDrawer = new GLDrawer2D(true);
-//				WrapRenderer renderer = new WrapRenderer(new CandyFilter(MyApplication.getAPP().getResources()));
-//				mDrawer.setWrapRenderer(renderer);
-//				mDrawer.init();
+	    		mDrawer = new CusGlDrawer(new BaseFuncFilter(MyApplication.getAPP().getResources(), "filter/default_fragment.sh"));
+//				mDrawer = new CusGlDrawer(new ColorBorderFilter(MyApplication.getAPP().getResources(), new float[]{0.0f, 1.0f, 0.0f, 1.0f}));
+//				mDrawer = new CusGlDrawer(new BlackMagicFilter(MyApplication.getAPP().getResources()));
 			}
 
 	    	private final void release() {
@@ -642,63 +676,82 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 
 	/**
 	 * 灰度显示
-	 * @param gray
 	 */
-	public void changeGray(boolean gray){
-		String fsStr = ShaderUtils.loadFromAssetsFile(gray ? "filter/gray_fragment.sh" : "filter/default_fragment.sh", MyApplication.mInstance.getResources());
-		String vsStr = ShaderUtils.loadFromAssetsFile("filter/gray_vertex.sh", MyApplication.mInstance.getResources());
-		mRenderHandler.updateShader(vsStr, fsStr);
-//		mRenderHandler.mThread.mFragmentPath = gray ? "filter/gray_fragment.sh" : "filter/default_fragment.sh";
+	public void changeGray(){
+		String fsPath = "filter/gray_fragment.sh";
+		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
 	}
 
 	/**
 	 * 亮黄显示
 	 */
 	public void changeBrightYellow(){
-		String fsStr = ShaderUtils.loadFromAssetsFile("filter/bright_yellow_fg.sh", MyApplication.mInstance.getResources());
-		String vsStr = ShaderUtils.loadFromAssetsFile("filter/default_vertex.sh", MyApplication.mInstance.getResources());
-		mRenderHandler.updateShader(vsStr, fsStr);
-		//		mRenderHandler.mThread.mFragmentPath = gray ? "filter/gray_fragment.sh" : "filter/default_fragment.sh";
+		String fsPath = "filter/bright_yellow_fg.sh";
+		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
 	}
 
 	/**
 	 * 浅茶色显示
 	 */
 	public void changeOriginal(){
-		String fsStr = ShaderUtils.loadFromAssetsFile("filter/default_fragment.sh", MyApplication.mInstance.getResources());
-		String vsStr = ShaderUtils.loadFromAssetsFile("filter/default_vertex.sh", MyApplication.mInstance.getResources());
-		mRenderHandler.updateShader(vsStr, fsStr);
-		//		mRenderHandler.mThread.mFragmentPath = gray ? "filter/gray_fragment.sh" : "filter/default_fragment.sh";
+		String fsPath = "filter/default_fragment.sh";
+		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
 	}
 
 	/**
 	 * 浅茶色显示
 	 */
 	public void changeLightTea(){
-		String fsStr = ShaderUtils.loadFromAssetsFile("filter/light_tea_fg.sh", MyApplication.mInstance.getResources());
-		String vsStr = ShaderUtils.loadFromAssetsFile("filter/default_vertex.sh", MyApplication.mInstance.getResources());
-		mRenderHandler.updateShader(vsStr, fsStr);
-		//		mRenderHandler.mThread.mFragmentPath = gray ? "filter/gray_fragment.sh" : "filter/default_fragment.sh";
+		String fsPath = "filter/light_tea_fg.sh";
+		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
+
 	}
 
 	/**
 	 * 浅茶色显示
 	 */
 	public void changeDarkTea(){
-		String fsStr = ShaderUtils.loadFromAssetsFile("filter/dark_tea_fg.sh", MyApplication.mInstance.getResources());
-		String vsStr = ShaderUtils.loadFromAssetsFile("filter/default_vertex.sh", MyApplication.mInstance.getResources());
-		mRenderHandler.updateShader(vsStr, fsStr);
-		//		mRenderHandler.mThread.mFragmentPath = gray ? "filter/gray_fragment.sh" : "filter/default_fragment.sh";
+		String fsPath = "filter/dark_tea_fg.sh";
+		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
 	}
 
 	/**
 	 * 浅茶色显示
 	 */
 	public void changeReverse(){
-		String fsStr = ShaderUtils.loadFromAssetsFile("filter/reverse_fg.sh", MyApplication.mInstance.getResources());
-		String vsStr = ShaderUtils.loadFromAssetsFile("filter/default_vertex.sh", MyApplication.mInstance.getResources());
-		mRenderHandler.updateShader(vsStr, fsStr);
-		//		mRenderHandler.mThread.mFragmentPath = gray ? "filter/gray_fragment.sh" : "filter/default_fragment.sh";
+		String fsPath = "filter/reverse_fg.sh";
+		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
 	}
+
+	/**
+	 * 白色描边
+	 */
+	public void changeWhiteBorder(){
+//		String fsPath = "filter/reverse_fg.sh";
+		mRenderHandler.updateShader(new WhiteBorderFilter(MyApplication.getAPP().getResources()));
+	}
+
+	/**
+	 * 白色描边
+	 */
+	public void changeBlackBorder(){
+		//		String fsPath = "filter/reverse_fg.sh";
+		mRenderHandler.updateShader(new BlackBorderFilter(MyApplication.getAPP().getResources()));
+	}
+
+	/**
+	 * 全彩绿边
+	 */
+	public void changeColorGreenBorder(){
+		mRenderHandler.updateShader(new ColorBorderFilter(MyApplication.getAPP().getResources(), new float[]{0.0f, 1.0f, 0.0f, 1.0f}));
+	}
+
+	/**
+	 * 全彩黄边
+	 */
+	public void changeColorYellowBorder(){
+		mRenderHandler.updateShader(new ColorBorderFilter(MyApplication.getAPP().getResources(), new float[]{1.0f, 1.0f, 0.0f, 1.0f}));
+	}
+
 
 }

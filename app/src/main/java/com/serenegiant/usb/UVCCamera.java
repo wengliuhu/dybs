@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UVCCamera {
-	private static final boolean DEBUG = false;	// TODO set false when releasing
+	private static final boolean DEBUG = true;	// TODO set false when releasing
 	private static final String TAG = UVCCamera.class.getSimpleName();
 	private static final String DEFAULT_USBFS = "/dev/bus/usb";
 
@@ -466,7 +466,9 @@ public class UVCCamera {
 //================================================================================
 	public synchronized void setAutoFocus(final boolean autoFocus) {
     	if (mNativePtr != 0) {
-    		nativeSetAutoFocus(mNativePtr, autoFocus);
+			if (DEBUG) Log.v("uvcNative", "----------setAutoFocus---:" + autoFocus);
+
+			nativeSetAutoFocus(mNativePtr, autoFocus);
     	}
     }
 
@@ -657,6 +659,7 @@ public class UVCCamera {
 
 //================================================================================
     /**
+	 * 锐度（和对比度相关）
      * @param sharpness [%]
      */
 	public synchronized void setSharpness(final int sharpness) {
@@ -697,6 +700,7 @@ public class UVCCamera {
     }
 //================================================================================
     /**
+	 * 增益
      * @param gain [%]
      */
 	public synchronized void setGain(final int gain) {
@@ -779,6 +783,7 @@ public class UVCCamera {
 
 //================================================================================
     /**
+	 * 饱和度
      * @param saturation [%]
      */
 	public synchronized void setSaturation(final int saturation) {

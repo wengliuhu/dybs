@@ -53,12 +53,7 @@ public class SettingDialog extends DialogFragment {
     private SeekBar mSeekBarContrast;//对比度
     private SeekBar mSeekBarBrightness;//亮度
     private SeekBar mSeekBarScale;//缩放
-//    private CheckBox mCheckBox2Colors;//两色
-//    private CheckBox mCheckBoxGray;//黑白（灰度）
-//    private CheckBox mCheckBoxReverse;//反相
-//    private CheckBox mCheckBoxBorder;//描边
-//    private CheckBox mCheckBoxCompare;//对比
-//    private CheckBox mCheckboxColorize;//伪彩
+
     private TextView mTvContrast;
     private TextView mTvBrightness;
     private TextView mTvScale;
@@ -66,17 +61,12 @@ public class SettingDialog extends DialogFragment {
     private TextView mTvReset;
     private TextView mTvResolution;
     private View mResolutionView;
-//    private TextView mTvOriginalColor;
-//    private TextView mTvGrayColor;
-//    private TextView mTvBrightYellowColor;
 
     private DialogCallBack mDialogCallBack;
 
     public void setDialogCallBack(DialogCallBack mDialogCallBack) {
         this.mDialogCallBack = mDialogCallBack;
     }
-
-    private List<CheckBox> mList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -89,17 +79,11 @@ public class SettingDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-//        getDialog().setCancelable(false);
-//        getDialog().setCanceledOnTouchOutside(false);
+
         mSeekBarContrast = view.findViewById(R.id.seekbar_contrast);
         mSeekBarBrightness = view.findViewById(R.id.seekbar_brightness);
         mSeekBarScale = view.findViewById(R.id.seekbar_scale);
-//        mCheckBox2Colors = view.findViewById(R.id.cb_2_colors);
-//        mCheckBoxGray = view.findViewById(R.id.cb_gray);
-//        mCheckBoxReverse = view.findViewById(R.id.cb_reserve);
-//        mCheckBoxBorder = view.findViewById(R.id.cb_border);
-//        mCheckBoxCompare = view.findViewById(R.id.cb_compare);
-//        mCheckboxColorize = view.findViewById(R.id.cb_colorize);
+
         mTvContrast = view.findViewById(R.id.tv_contrast);
         mTvBrightness = view.findViewById(R.id.tv_brightness);
         mTvScale = view.findViewById(R.id.tv_scale);
@@ -107,9 +91,7 @@ public class SettingDialog extends DialogFragment {
         mTvReset = view.findViewById(R.id.tv_reset);
         mResolutionView = view.findViewById(R.id.ll_resolution);
         mTvResolution = view.findViewById(R.id.tv_resolution);
-//        mTvOriginalColor = view.findViewById(R.id.tv_original_color);
-//        mTvGrayColor = view.findViewById(R.id.tv_gray_color);
-//        mTvBrightYellowColor = view.findViewById(R.id.tv_bright_yellow_color);
+
         mTvResolution.setText(ConfigBean.getInstance().getWidth() + "x" + ConfigBean.getInstance().getHeight());
 
         mDataBingding.rbBrightYellow.setTag(DATA.BRIGHT_YELLOW);
@@ -118,6 +100,11 @@ public class SettingDialog extends DialogFragment {
         mDataBingding.rbGray.setTag(DATA.GRAY);
         mDataBingding.rbLightTea.setTag(DATA.LIGHT_TEA);
         mDataBingding.rbReverse.setTag(DATA.REVERSE);
+        mDataBingding.rbWhiteBorder.setTag(DATA.WHITE_BORDER);
+        mDataBingding.rbBlackBorder.setTag(DATA.BLACK_BORDER);
+        mDataBingding.rbColorGreenBorder.setTag(DATA.ALL_COLOR_GREEN_BORDER);
+        mDataBingding.rbColorYellowBorder.setTag(DATA.ALL_COLOR_YELLOW_BORDER);
+        RadioButton button = mDataBingding.rgColor.findViewWithTag(ConfigBean.getInstance().getFilterColor());
         mDataBingding.rgColor.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId)
@@ -130,10 +117,8 @@ public class SettingDialog extends DialogFragment {
                 }
             }
         });
-        RadioButton button = mDataBingding.rgColor.findViewWithTag(ConfigBean.getInstance().getFilterColor());
         button.setChecked(true);
         initListener();
-        initList();
     }
 
     private void initListener() {
@@ -209,66 +194,7 @@ public class SettingDialog extends DialogFragment {
                 ConfigBean.getInstance().setScale(seekBar.getProgress());
             }
         });
-/*        //两色
-        mCheckBox2Colors.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                ConfigBean.getInstance().setColor2Show(isChecked);
-                if (mDialogCallBack != null) {
-                    mDialogCallBack.onDialogCallBack(buttonView, COLOR_2, 0, isChecked);
-                }
-            }
-        });
-        //黑白(灰度)
-        mCheckBoxGray.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                ConfigBean.getInstance().setGrayShow(isChecked);
-                if (mDialogCallBack != null) {
-                    mDialogCallBack.onDialogCallBack(buttonView, COLOR_GRAY, 0, isChecked);
-                }
-            }
-        });
-        //反相
-        mCheckBoxReverse.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                ConfigBean.getInstance().setColorReverseShow(isChecked);
-                if (mDialogCallBack != null) {
-                    mDialogCallBack.onDialogCallBack(buttonView, COLOR_REVERSE, 0, isChecked);
-                }
-            }
-        });
-        //描边
-        mCheckBoxBorder.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                ConfigBean.getInstance().setColorBorderShow(isChecked);
-                if (mDialogCallBack != null) {
-                    mDialogCallBack.onDialogCallBack(buttonView, COLOR_BORDER, 0, isChecked);
-                }
-            }
-        });
-        //对比
-        mCheckBoxCompare.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                ConfigBean.getInstance().setColorReverseShow(isChecked);
-                if (mDialogCallBack != null) {
-                    mDialogCallBack.onDialogCallBack(buttonView, COLOR_COMPARE, 0, isChecked);
-                }
-            }
-        });
-        //伪彩
-        mCheckboxColorize.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                ConfigBean.getInstance().setColorizeShow(isChecked);
-                if (mDialogCallBack != null) {
-                    mDialogCallBack.onDialogCallBack(buttonView, COLOR_COLORIZE, 0, isChecked);
-                }
-            }
-        });*/
+
         //分辨率
         mResolutionView.setOnClickListener(v-> {
             if (mDialogCallBack != null) {
@@ -291,76 +217,9 @@ public class SettingDialog extends DialogFragment {
             mSeekBarContrast.setProgress(AppConstant.CONFIG_CONTRAST);
             mSeekBarBrightness.setProgress(AppConstant.CONFIG_BRIGHTNESS);
             mSeekBarScale.setProgress(AppConstant.CONFIG_SCALE);
-//            mCheckBoxGray.setChecked(false);
             mTvScale.setText("x " + AppConstant.CONFIG_SCALE);
-//            mTvGrayColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorWhite));
-//            mTvOriginalColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
             ((RadioButton)mDataBingding.rgColor.findViewWithTag(DATA.ORIGINAL)).setChecked(true);
         });
-       /* mCheckBox2Colors.setOnClickListener(v-> {
-            updateCheckBoxStatus(mCheckBox2Colors);
-        });
-        mCheckBoxGray.setOnClickListener(v-> {
-            updateCheckBoxStatus(mCheckBoxGray);
-        });
-        mCheckBoxReverse.setOnClickListener(v-> {
-            updateCheckBoxStatus(mCheckBoxReverse);
-        });
-        mCheckBoxBorder.setOnClickListener(v-> {
-            updateCheckBoxStatus(mCheckBoxBorder);
-        });
-        mCheckBoxCompare.setOnClickListener(v-> {
-            updateCheckBoxStatus(mCheckBoxCompare);
-        });
-        mCheckboxColorize.setOnClickListener(v-> {
-            updateCheckBoxStatus(mCheckboxColorize);
-        });
-        mTvOriginalColor.setOnClickListener(v-> {
-            mTvOriginalColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
-            mTvGrayColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorWhite));
-            ConfigBean.getInstance().setGrayShow(false);
-            if (mDialogCallBack != null) {
-                mDialogCallBack.onDialogCallBack(mTvOriginalColor, COLOR_GRAY, 0, false);
-            }
-        });
-        mTvGrayColor.setOnClickListener(v-> {
-            mTvGrayColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
-            mTvOriginalColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorWhite));
-            ConfigBean.getInstance().setGrayShow(true);
-            if (mDialogCallBack != null) {
-                mDialogCallBack.onDialogCallBack(mTvOriginalColor, COLOR_GRAY, 0, true);
-            }
-        });
-
-        mTvGrayColor.setOnClickListener(v-> {
-            mTvGrayColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
-            mTvOriginalColor.setTextColor(ContextCompat.getColor(getContext(), R.color.colorWhite));
-            ConfigBean.getInstance().setGrayShow(true);
-            if (mDialogCallBack != null) {
-                mDialogCallBack.onDialogCallBack(mTvOriginalColor, COLOR_GRAY, 0, true);
-            }
-        });*/
-
-    }
-
-       private void initList() {
-        mList.clear();
-/*        mList.add(mCheckBox2Colors);
-        mList.add(mCheckBoxGray);
-        mList.add(mCheckBoxCompare);
-        mList.add(mCheckboxColorize);
-        mList.add(mCheckBoxBorder);
-        mList.add(mCheckBoxReverse);*/
-    }
-
-    private void updateCheckBoxStatus(CheckBox originalCheckBox) {
-        for(CheckBox checkBox : mList) {
-            if (checkBox.getId() == originalCheckBox.getId()) {
-                checkBox.setChecked(originalCheckBox.isChecked());
-            } else {
-                checkBox.setChecked(false);
-            }
-        }
     }
 
     /**
@@ -369,11 +228,6 @@ public class SettingDialog extends DialogFragment {
      */
     public void setResolution(String resolution) {
         mTvResolution.setText(resolution);
-    }
-
-    public void updateBrightness(int progress) {
-        mSeekBarBrightness.setProgress(progress);
-        mTvBrightness.setText(progress + "%");
     }
 
     public void updateScale(int progress) {

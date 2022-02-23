@@ -1,10 +1,9 @@
 package com.artheia.usbcamera.gl;
 
 
+import com.artheia.usbcamera.application.MyApplication;
 import com.artheia.usbcamera.gl.core.Renderer;
-import com.artheia.usbcamera.gl.filter.BaseFilter;
-import com.artheia.usbcamera.gl.filter.GroupFilter;
-import com.serenegiant.glutils.GLHelper;
+import com.artheia.usbcamera.gl.filter.WhiteBorderFilter;
 
 /**
  * @author : wengliuhu
@@ -13,46 +12,22 @@ import com.serenegiant.glutils.GLHelper;
  * Describe： 用于组合滤镜显示
  */
 public class CusGlDrawer {
-//    private static final float[] VERTICES = new float[]{1.0F, 1.0F, -1.0F, 1.0F, 1.0F, -1.0F, -1.0F, -1.0F};
-//    private static final float[] TEXCOORD = new float[]{1.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 0.0F, 0.0F};
-//    private static final int FLOAT_SZ = 4;
-//    private int hProgram;
-//    int maPositionLoc;
-//    int maTextureCoordLoc;
-//    int muMVPMatrixLoc;
-//    int muTexMatrixLoc;
-//    private final int VERTEX_NUM;
-//    private final int VERTEX_SZ;
-//    private final FloatBuffer pVertex;
-//    private final FloatBuffer pTexCoord;
-//    private final int mTexTarget;
-//    private final float[] mMvpMatrix;
-
-    private final int mTexTarget;
-
-    private String fragmentFilePath;
-
     private WrapRenderer wrapRenderer;
-
-    public WrapRenderer getWrapRenderer() {
-        return wrapRenderer;
-    }
-
-    public void setWrapRenderer(WrapRenderer wrapRenderer) {
-        this.wrapRenderer = wrapRenderer;
-    }
-
-    public CusGlDrawer(boolean isOES) {
+    public CusGlDrawer(Renderer renderer) {
 //        this(isOES, "filter/default_fragment.sh");
-        this.mTexTarget = isOES ? '赥' : 3553;
-    }
-
-    public void init(){
+//        this.mTexTarget = isOES ? '赥' : 3553;
+//        wrapRenderer = new WrapRenderer(new BaseFuncFilter(MyApplication.getAPP().getResources(), "filter/default_fragment.sh"));
+        wrapRenderer = new WrapRenderer(renderer);
+//        wrapRenderer = new WrapRenderer(new WhiteBorderFilter(MyApplication.getAPP().getResources()));
         wrapRenderer.create();
     }
 
-    public boolean isOES() {
-        return this.mTexTarget == 36197;
+    public void sizeChanged(int width, int height){
+        wrapRenderer.sizeChanged(width, height);
+    }
+
+    public int createTexId(int oldTexId){
+        return wrapRenderer.createTexId(oldTexId);
     }
 
     public void release() {
@@ -63,17 +38,10 @@ public class CusGlDrawer {
         wrapRenderer.draw(texId, tex_matrix, offset);
     }
 
-    public int initTex() {
-        return GLHelper.initTex(this.mTexTarget, 9728);
-    }
-
-    public void deleteTex(int hTex) {
-        GLHelper.deleteTex(hTex);
-    }
-
-    public synchronized void updateShader(Renderer renderer) {
-        release();
+    public synchronized void updateShader(Renderer renderer, int width, int height) {
+        wrapRenderer.destroy();
         wrapRenderer = new WrapRenderer(renderer);
         wrapRenderer.create();
+        wrapRenderer.sizeChanged(width,height);
     }
 }
