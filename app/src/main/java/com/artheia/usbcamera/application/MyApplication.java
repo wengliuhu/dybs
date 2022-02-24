@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.artheia.usbcamera.utils.CrashHandler;
 import com.artheia.usbcamera.utils.TtsSpeaker;
+import com.artheia.usbcamera.wakeup.WakeUpHelper;
 
 /**application class
  *
@@ -23,6 +24,8 @@ public class MyApplication extends Application {
 //        mCrashHandler.init(getApplicationContext(), getClass());
         mInstance = this;
         TtsSpeaker.getInstance().init(this);
+        // 初始化wakeup
+        WakeUpHelper.getInstance().init(this);
     }
 
     public static MyApplication getAPP(){

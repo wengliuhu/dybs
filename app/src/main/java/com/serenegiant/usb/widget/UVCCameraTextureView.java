@@ -44,6 +44,7 @@ import com.artheia.usbcamera.gl.filter.BeautyFilter;
 import com.artheia.usbcamera.gl.filter.BlackBorderFilter;
 import com.artheia.usbcamera.gl.filter.BlackMagicFilter;
 import com.artheia.usbcamera.gl.filter.ColorBorderFilter;
+import com.artheia.usbcamera.gl.filter.DoubleColorFilter;
 import com.artheia.usbcamera.gl.filter.Faltung3x3Filter;
 import com.artheia.usbcamera.gl.filter.FluorescenceFilter;
 import com.artheia.usbcamera.gl.filter.WaterColorFilter;
@@ -716,12 +717,22 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	}
 
 	/**
-	 * 浅茶色显示
+	 * 反色显示
 	 */
 	public void changeReverse(){
 		String fsPath = "filter/reverse_fg.sh";
 		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
 	}
+
+	/**
+	 * 红、绿 两色
+	 */
+	public void changeRedGreen(){
+		String fsPath = "filter/red_green_fg.sh";
+//		mRenderHandler.updateShader(new DoubleColorFilter(MyApplication.getAPP().getResources()));
+		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
+	}
+
 
 	/**
 	 * 白色描边
@@ -732,7 +743,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	}
 
 	/**
-	 * 白色描边
+	 * 黑色描边
 	 */
 	public void changeBlackBorder(){
 		//		String fsPath = "filter/reverse_fg.sh";
@@ -752,6 +763,4 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	public void changeColorYellowBorder(){
 		mRenderHandler.updateShader(new ColorBorderFilter(MyApplication.getAPP().getResources(), new float[]{1.0f, 1.0f, 0.0f, 1.0f}));
 	}
-
-
 }

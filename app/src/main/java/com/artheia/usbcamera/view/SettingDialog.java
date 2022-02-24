@@ -99,6 +99,7 @@ public class SettingDialog extends DialogFragment {
         mDataBingding.rbOriginal.setTag(DATA.ORIGINAL);
         mDataBingding.rbGray.setTag(DATA.GRAY);
         mDataBingding.rbLightTea.setTag(DATA.LIGHT_TEA);
+        mDataBingding.rbRedGreen.setTag(DATA.RED_GREEN);
         mDataBingding.rbReverse.setTag(DATA.REVERSE);
         mDataBingding.rbWhiteBorder.setTag(DATA.WHITE_BORDER);
         mDataBingding.rbBlackBorder.setTag(DATA.BLACK_BORDER);

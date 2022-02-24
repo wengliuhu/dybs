@@ -202,12 +202,19 @@
                         android:text="浅茶"/>
 
                     <RadioButton
+                        android:id="@+id/rb_red_green"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:tag="@{DATA.RED_GREEN}"
+                        android:textColor="@color/radiobutton_select"
+                        android:text="两色"/>
+                    <RadioButton
                         android:id="@+id/rb_reverse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:tag="@{DATA.REVERSE}"
                         android:textColor="@color/radiobutton_select"
-                        android:text="反色"/>
+                        android:text="反相"/>
 
                     <RadioButton
                         android:id="@+id/rb_white_border"

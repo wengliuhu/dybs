@@ -11,7 +11,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters "armeabi", "armeabi-v7a", "x86", "mips", "arm64-v8a", "x86_64"
+//            abiFilters "armeabi", "armeabi-v7a", "x86", "mips", "arm64-v8a", "x86_64"
+            abiFilters "armeabi", "armeabi-v7a",  "arm64-v8a"
         }
     }
     buildTypes {
@@ -61,4 +62,7 @@ dependencies {
     api 'io.reactivex.rxjava2:rxjava:2.1.0'
     api 'com.squareup.retrofit2:converter-gson:2.1.0'
 
+    // 事件总线
+    implementation "io.github.wengliuhu:Bus:1.0@aar"
+    implementation project(path: ':core')
 }

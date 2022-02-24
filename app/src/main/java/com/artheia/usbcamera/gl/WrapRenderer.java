@@ -22,10 +22,10 @@ import com.artheia.usbcamera.gl.utils.GpuUtils;
 import com.serenegiant.glutils.GLHelper;
 
 /**
- * WrapRenderer 用于包装其他Filter渲染OES纹理
- *
- * @author wuwang
- * @version v1.0 2017:10:27 08:53
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-12 10:13
+ * Describe：用于包装其他Filter渲染OES纹理
  */
 public class WrapRenderer implements Renderer
 {

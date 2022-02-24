@@ -4,11 +4,23 @@
     package="com.artheia.usbcamera">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-feature android:name="android.hardware.usb.host"/>
+
+    <meta-data
+        android:name="com.baidu.speech.APP_ID"
+        android:value="25658065"/>
+
+    <meta-data
+        android:name="com.baidu.speech.API_KEY"
+        android:value="kkvyStXRiirr4pYrmaOcifyk"/>
+    <meta-data
+        android:name="com.baidu.speech.SECRET_KEY"
+        android:value="v80joAakIlTo3kUcjY66FEVPSPsFXGsz"/>
 
     <application
         android:name="com.artheia.usbcamera.application.MyApplication"
@@ -33,6 +45,11 @@
                 <action android:name="android.intent.action.VIEW"/>
             </intent-filter>
         </activity>
+
+        <provider
+            android:authorities="${applicationId}.contextprovider"
+            android:name="com.yanantec.ynbus.YnContentProvider"
+            android:exported="true"/>
     </application>
 
 </manifest>

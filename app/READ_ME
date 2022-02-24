@@ -1,0 +1,3 @@
+百度语音唤醒so库：libBaiduSpeechSDK.so、libbd_easr_s1_merge_normal_20151216.dat.so、libbdEASRAndroid.so、libbdSpilWakeup.so、libvad.dnn.so
+uvc库：libjpeg-turbo1500.so、libusb100.so、libuvc.so、libUVCCamera.so
+OCR库：libocr-sdk.so

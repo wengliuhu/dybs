@@ -2,9 +2,6 @@ package com.artheia.usbcamera.gl.core;
 
 import java.util.ArrayList;
 
-/*
- * Created by Wuwang on 2017/10/23
- */
 public class Observable<Type> implements IObservable<Type> {
 
     private ArrayList<IObserver<Type>> temp;

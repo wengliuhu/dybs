@@ -7,5 +7,6 @@ varying highp vec2 vTextureCo;
 void main() {
 
  vec4 mask = texture2D(uTexture, vTextureCo);
-    gl_FragColor = vec4(0.4314, 0.1569, mask[2], 0);
+        gl_FragColor = vec4(0.4314, 0.1569, mask[2], mask.a);
+
 }

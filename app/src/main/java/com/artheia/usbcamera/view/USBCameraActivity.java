@@ -38,11 +38,13 @@ import com.artheia.usbcamera.ocr.OcrHelper;
 import com.artheia.usbcamera.ocr.OcrResult;
 import com.artheia.usbcamera.ocr.RecognizeService;
 import com.artheia.usbcamera.utils.FileUtils;
+import com.artheia.usbcamera.utils.FilterHelper;
 import com.artheia.usbcamera.utils.TtsSpeaker;
 import com.artheia.usbcamera.utils.Utils;
 import com.artheia.usbcamera.view.widget.AppConstant;
 import com.artheia.usbcamera.view.widget.AutoScanView;
 import com.artheia.usbcamera.view.widget.LightScaleView;
+import com.artheia.usbcamera.wakeup.WakeUpHelper;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.serenegiant.usb.CameraDialog;
@@ -52,6 +54,7 @@ import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.usb.common.AbstractUVCCameraHandler;
 import com.serenegiant.usb.widget.CameraViewInterface;
 import com.serenegiant.usb.widget.UVCCameraTextureView;
+import com.yanantec.ynbus.annotation.OnMessage;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -249,6 +252,13 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
     }
 
     @Override
+    protected void onResume()
+    {
+        super.onResume();
+        WakeUpHelper.getInstance().start(this);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         // step.2 register USB event broadcast
@@ -263,6 +273,35 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
         // step.3 unregister USB event broadcast
         if (mCameraHelper != null) {
             mCameraHelper.unregisterUSB();
+        }
+
+        WakeUpHelper.getInstance().stop();
+    }
+
+    @OnMessage(value = WakeUpHelper.KEY_WAKE_UP, discard = true)
+    public void getWakeUp(String word){
+        if (TextUtils.equals(word, "小艾放大")){
+            int scale = ConfigBean.getInstance().getScale();
+            if (scale < 23){
+                scale ++;
+                ConfigBean.getInstance().setScale(scale);
+                goScale(scale, 23);
+            }else {
+                TtsSpeaker.getInstance().addMessage("已缩放达到最大");
+            }
+
+        }else if (TextUtils.equals(word, "小艾缩小")){
+            int scale = ConfigBean.getInstance().getScale();
+            if (scale > 0){
+                scale --;
+                ConfigBean.getInstance().setScale(scale);
+                goScale(scale, 23);
+            }else {
+                TtsSpeaker.getInstance().addMessage("已缩放达到最大");
+            }
+        }else if (TextUtils.equals(word, "小艾切换")){
+            if(mCameraHelper != null && mCameraHelper.isCameraOpened() && mMatrix != null)
+                FilterHelper.getInstance().changeNextFilter(mUVCCameraView);
         }
     }
 
@@ -459,6 +498,8 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
             @Override
             public void onDialogCallBack(View view, int type, int progress, boolean isChecked) {
                 if(mCameraHelper != null && mCameraHelper.isCameraOpened() && mMatrix != null) {
+                    // 是颜色滤镜部分
+                    if (FilterHelper.getInstance().changeFilter(mUVCCameraView, type)) return;
                     switch (type) {
                         //对比度
                         case AppConstant.CONTRAST:
@@ -508,59 +549,8 @@ public class USBCameraActivity extends AppCompatActivity implements CameraDialog
                                 updateResolution(list.get(0));
                             }
                             break;
-
-                            // 色彩部分
-                        case DATA.ORIGINAL:
-                        {
-                            mUVCCameraView.changeOriginal();
-                            break;
-                        }
-                        case DATA.GRAY:
-                        {
-                            mUVCCameraView.changeGray();
-                            break;
-                        }
-                        case DATA.BRIGHT_YELLOW:
-                        {
-                            mUVCCameraView.changeBrightYellow();
-                            break;
-                        }
-                        case DATA.REVERSE:
-                        {
-                            mUVCCameraView.changeReverse();
-                            break;
-                        }
-                        case DATA.DARK_TEA:
-                        {
-                            mUVCCameraView.changeDarkTea();
-                            break;
-                        }
-                        case DATA.LIGHT_TEA:
-                        {
-                            mUVCCameraView.changeLightTea();
-                            break;
-                        }
-                        case DATA.WHITE_BORDER:
-                        {
-                            mUVCCameraView.changeWhiteBorder();
-                            break;
-                        }
-                        case DATA.BLACK_BORDER:
-                        {
-                            mUVCCameraView.changeBlackBorder();
-                            break;
-                        }
-                        case DATA.ALL_COLOR_GREEN_BORDER:
-                        {
-                            mUVCCameraView.changeColorGreenBorder();
-                            break;
-                        }
-                        case DATA.ALL_COLOR_YELLOW_BORDER:
-                        {
-                            mUVCCameraView.changeColorYellowBorder();
-                            break;
-                        }
                     }
+
                 }
             }
         });

@@ -15,12 +15,11 @@ package com.artheia.usbcamera.gl.utils;
 
 import android.opengl.Matrix;
 import android.widget.ImageView;
-
 /**
- * MatrixUtils
- *
- * @author wuwang
- * @version v1.0 2017:11:01 10:41
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-10 10:12
+ * Describe：
  */
 public enum MatrixUtils {
     ;

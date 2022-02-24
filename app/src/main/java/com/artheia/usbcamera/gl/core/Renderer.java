@@ -16,10 +16,16 @@ package com.artheia.usbcamera.gl.core;
 import java.io.Serializable;
 
 /**
- * Renderer 渲染接口，渲染的四个接口应该在同一个GL线程中调用
+ * Renderer
  *
  * @author wuwang
  * @version v1.0 2017:10:31 11:40
+ */
+/**
+ * @author : wengliuhu
+ * @version : 0.1
+ * @since : 2022-02-10 10:11
+ * Describe：渲染接口，渲染的四个接口应该在同一个GL线程中调用
  */
 public interface Renderer extends Serializable
 {
