@@ -47,6 +47,7 @@ import com.artheia.usbcamera.gl.filter.ColorBorderFilter;
 import com.artheia.usbcamera.gl.filter.DoubleColorFilter;
 import com.artheia.usbcamera.gl.filter.Faltung3x3Filter;
 import com.artheia.usbcamera.gl.filter.FluorescenceFilter;
+import com.artheia.usbcamera.gl.filter.HueFilter;
 import com.artheia.usbcamera.gl.filter.WaterColorFilter;
 import com.artheia.usbcamera.gl.filter.WaterMarkFilter;
 import com.artheia.usbcamera.gl.filter.WhiteBorderFilter;
@@ -64,16 +65,16 @@ import com.serenegiant.utils.FpsCounter;
  * XXX it is better that can set the aspect ratio as xml property
  */
 public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
-	implements TextureView.SurfaceTextureListener, CameraViewInterface {
+		implements TextureView.SurfaceTextureListener, CameraViewInterface {
 
 	private static final boolean DEBUG = true;	// TODO set false on release
 	private static final String TAG = "UVCCameraTextureView";
 
-    private boolean mHasSurface;
+	private boolean mHasSurface;
 	private RenderHandler mRenderHandler;
-    private final Object mCaptureSync = new Object();
-    private Bitmap mTempBitmap;
-    private boolean mReqesutCaptureStillImage;
+	private final Object mCaptureSync = new Object();
+	private Bitmap mTempBitmap;
+	private boolean mReqesutCaptureStillImage;
 	private Callback mCallback;
 	// Camera分辨率宽度
 
@@ -239,7 +240,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	public void resetFps() {
 		mFpsCounter.reset();
 	}
-	
+
 	/** update frame rate of image processing */
 	public void updateFps() {
 		mFpsCounter.update();
@@ -267,7 +268,7 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	 *
 	 */
 	private static final class RenderHandler extends Handler
-		implements SurfaceTexture.OnFrameAvailableListener  {
+			implements SurfaceTexture.OnFrameAvailableListener  {
 
 		private static final int MSG_REQUEST_RENDER = 1;
 		private static final int MSG_SET_ENCODER = 2;
@@ -281,8 +282,8 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 		private final FpsCounter mFpsCounter;
 
 		public static final RenderHandler createHandler(final FpsCounter counter,
-			final SurfaceTexture surface, final int width, final int height) {
-			
+														final SurfaceTexture surface, final int width, final int height) {
+
 			final RenderThread thread = new RenderThread(counter, surface, width, height);
 			thread.start();
 			return thread.getHandler();
@@ -377,48 +378,48 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 		public final void handleMessage(final Message msg) {
 			if (mThread == null) return;
 			switch (msg.what) {
-			case MSG_REQUEST_RENDER:
-				mThread.onDrawFrame();
-				break;
-			case MSG_SET_ENCODER:
-				mThread.setEncoder((MediaEncoder)msg.obj);
-				break;
-			case MSG_CREATE_SURFACE:
-				mThread.updatePreviewSurface();
-				break;
-			case MSG_RESIZE:
-				mThread.resize(msg.arg1, msg.arg2);
-				break;
-			case MSG_TERMINATE:
-				Looper.myLooper().quit();
-				mThread = null;
-				break;
-			case MSG_UPDATE_SHADER: {
-				String vsStr = msg.getData().getString("vs");
-				String fsStr = msg.getData().getString("fs");
-				Object  rendererObj = msg.getData().getSerializable("renderer");
-				if (rendererObj instanceof Renderer){
-					mThread.updateShader((Renderer) rendererObj);
+				case MSG_REQUEST_RENDER:
+					mThread.onDrawFrame();
+					break;
+				case MSG_SET_ENCODER:
+					mThread.setEncoder((MediaEncoder)msg.obj);
+					break;
+				case MSG_CREATE_SURFACE:
+					mThread.updatePreviewSurface();
+					break;
+				case MSG_RESIZE:
+					mThread.resize(msg.arg1, msg.arg2);
+					break;
+				case MSG_TERMINATE:
+					Looper.myLooper().quit();
+					mThread = null;
+					break;
+				case MSG_UPDATE_SHADER: {
+					String vsStr = msg.getData().getString("vs");
+					String fsStr = msg.getData().getString("fs");
+					Object  rendererObj = msg.getData().getSerializable("renderer");
+					if (rendererObj instanceof Renderer){
+						mThread.updateShader((Renderer) rendererObj);
+					}
+					break;
 				}
-				break;
-			}
-			default:
-				super.handleMessage(msg);
+				default:
+					super.handleMessage(msg);
 			}
 		}
 
 		private static final class RenderThread extends Thread {
-	    	private final Object mSync = new Object();
-	    	private final SurfaceTexture mSurface;
-	    	private RenderHandler mHandler;
-	    	private EGLBase mEgl;
-	    	/** IEglSurface instance related to this TextureView */
-	    	private EGLBase.IEglSurface mEglSurface;
+			private final Object mSync = new Object();
+			private final SurfaceTexture mSurface;
+			private RenderHandler mHandler;
+			private EGLBase mEgl;
+			/** IEglSurface instance related to this TextureView */
+			private EGLBase.IEglSurface mEglSurface;
 			// TODO: 2022/2/18 替换成组合滤镜
-	    	private CusGlDrawer mDrawer;
-	    	private int mTexId = -1;
-	    	/** SurfaceTexture instance to receive video images */
-	    	private SurfaceTexture mPreviewSurface;
+			private CusGlDrawer mDrawer;
+			private int mTexId = -1;
+			/** SurfaceTexture instance to receive video images */
+			private SurfaceTexture mPreviewSurface;
 			private final float[] mStMatrix = new float[16];
 			private MediaEncoder mEncoder;
 			private int mViewWidth, mViewHeight;
@@ -428,25 +429,25 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 			 * constructor
 			 * @param surface: drawing surface came from TexureView
 			 */
-	    	public RenderThread(final FpsCounter fpsCounter, final SurfaceTexture surface, final int width, final int height) {
+			public RenderThread(final FpsCounter fpsCounter, final SurfaceTexture surface, final int width, final int height) {
 				mFpsCounter = fpsCounter;
-	    		mSurface = surface;
+				mSurface = surface;
 				mViewWidth = width;
 				mViewHeight = height;
-	    		setName("RenderThread");
+				setName("RenderThread");
 			}
 
 			public final RenderHandler getHandler() {
 				if (DEBUG) Log.v(TAG, "RenderThread#getHandler:");
-	            synchronized (mSync) {
-	                // create rendering thread
-	            	if (mHandler == null)
-	            	try {
-	            		mSync.wait();
-	            	} catch (final InterruptedException e) {
-	                }
-	            }
-	            return mHandler;
+				synchronized (mSync) {
+					// create rendering thread
+					if (mHandler == null)
+						try {
+							mSync.wait();
+						} catch (final InterruptedException e) {
+						}
+				}
+				return mHandler;
 			}
 
 			public void resize(final int width, final int height) {
@@ -462,14 +463,14 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 			}
 
 			public final void updatePreviewSurface() {
-	            if (DEBUG) Log.i(TAG, "RenderThread#updatePreviewSurface:");
-	            synchronized (mSync) {
-	            	if (mPreviewSurface != null) {
-	            		if (DEBUG) Log.d(TAG, "updatePreviewSurface:release mPreviewSurface");
-	            		mPreviewSurface.setOnFrameAvailableListener(null);
-	            		mPreviewSurface.release();
-	            		mPreviewSurface = null;
-	            	}
+				if (DEBUG) Log.i(TAG, "RenderThread#updatePreviewSurface:");
+				synchronized (mSync) {
+					if (mPreviewSurface != null) {
+						if (DEBUG) Log.d(TAG, "updatePreviewSurface:release mPreviewSurface");
+						mPreviewSurface.setOnFrameAvailableListener(null);
+						mPreviewSurface.release();
+						mPreviewSurface = null;
+					}
 					mEglSurface.makeCurrent();
 					// TODO: 2022/2/21 modify
 		           /* if (mTexId >= 0) {
@@ -477,20 +478,20 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 		            }
 		    		// create texture and SurfaceTexture for input from camera
 		            mTexId = mDrawer.initTex();*/
-		           // 把其他滤镜的纹理销毁
-		          	mDrawer.sizeChanged(mViewWidth, mViewHeight);
-		          	// 创建新的纹理
-		          	mTexId = mDrawer.createTexId(mTexId);
+					// 把其他滤镜的纹理销毁
+					mDrawer.sizeChanged(mViewWidth, mViewHeight);
+					// 创建新的纹理
+					mTexId = mDrawer.createTexId(mTexId);
 
-		            if (DEBUG) Log.v(TAG, "-------------updatePreviewSurface:tex_id=" + mTexId);
-		            mPreviewSurface = new SurfaceTexture(mTexId);
+					if (DEBUG) Log.v(TAG, "-------------updatePreviewSurface:tex_id=" + mTexId);
+					mPreviewSurface = new SurfaceTexture(mTexId);
 					mPreviewSurface.setDefaultBufferSize(mViewWidth, mViewHeight);
-		            mPreviewSurface.setOnFrameAvailableListener(mHandler);
+					mPreviewSurface.setOnFrameAvailableListener(mHandler);
 					// TODO: 2022/2/18 增加尺寸
 //					mDrawer.getWrapRenderer().sizeChanged(mViewWidth, mViewHeight);
-		            // notify to caller thread that previewSurface is ready
+					// notify to caller thread that previewSurface is ready
 					mSync.notifyAll();
-	            }
+				}
 			}
 
 			public final void setEncoder(final MediaEncoder encoder) {
@@ -501,10 +502,10 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 				mEncoder = encoder;
 			}
 
-/*
- * Now you can get frame data as ByteBuffer(as YUV/RGB565/RGBX/NV21 pixel format) using IFrameCallback interface
- * with UVCCamera#setFrameCallback instead of using following code samples.
- */
+			/*
+			 * Now you can get frame data as ByteBuffer(as YUV/RGB565/RGBX/NV21 pixel format) using IFrameCallback interface
+			 * with UVCCamera#setFrameCallback instead of using following code samples.
+			 */
 /*			// for part1
  			private static final int BUF_NUM = 1;
 			private static final int BUF_STRIDE = 640 * 480;
@@ -620,58 +621,58 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 			@Override
 			public final void run() {
 				Log.d(TAG, getName() + " started");
-	            init();
-	            Looper.prepare();
-	            synchronized (mSync) {
-	            	mHandler = new RenderHandler(mFpsCounter, this);
-	                mSync.notify();
-	            }
+				init();
+				Looper.prepare();
+				synchronized (mSync) {
+					mHandler = new RenderHandler(mFpsCounter, this);
+					mSync.notify();
+				}
 
-	            Looper.loop();
+				Looper.loop();
 
-	            Log.d(TAG, getName() + " finishing");
-	            release();
-	            synchronized (mSync) {
-	                mHandler = null;
-	                mSync.notify();
-	            }
+				Log.d(TAG, getName() + " finishing");
+				release();
+				synchronized (mSync) {
+					mHandler = null;
+					mSync.notify();
+				}
 			}
 
 			private final void init() {
 				if (DEBUG) Log.v(TAG, "RenderThread#init:");
 				// create EGLContext for this thread
-	            mEgl = EGLBase.createFrom(null, false, false);
-	    		mEglSurface = mEgl.createFromSurface(mSurface);
-	    		mEglSurface.makeCurrent();
-	    		// create drawing object
-	    		mDrawer = new CusGlDrawer(new BaseFuncFilter(MyApplication.getAPP().getResources(), "filter/default_fragment.sh"));
+				mEgl = EGLBase.createFrom(null, false, false);
+				mEglSurface = mEgl.createFromSurface(mSurface);
+				mEglSurface.makeCurrent();
+				// create drawing object
+				mDrawer = new CusGlDrawer(new BaseFuncFilter(MyApplication.getAPP().getResources(), "filter/default_fragment.sh"));
 //				mDrawer = new CusGlDrawer(new ColorBorderFilter(MyApplication.getAPP().getResources(), new float[]{0.0f, 1.0f, 0.0f, 1.0f}));
 //				mDrawer = new CusGlDrawer(new BlackMagicFilter(MyApplication.getAPP().getResources()));
 			}
 
-	    	private final void release() {
+			private final void release() {
 				if (DEBUG) Log.v(TAG, "RenderThread#release:");
-	    		if (mDrawer != null) {
-	    			mDrawer.release();
-	    			mDrawer = null;
-	    		}
-	    		if (mPreviewSurface != null) {
-	    			mPreviewSurface.release();
-	    			mPreviewSurface = null;
-	    		}
-	            if (mTexId >= 0) {
-	            	GLHelper.deleteTex(mTexId);
-	            	mTexId = -1;
-	            }
-	    		if (mEglSurface != null) {
-	    			mEglSurface.release();
-	    			mEglSurface = null;
-	    		}
-	    		if (mEgl != null) {
-	    			mEgl.release();
-	    			mEgl = null;
-	    		}
-	    	}
+				if (mDrawer != null) {
+					mDrawer.release();
+					mDrawer = null;
+				}
+				if (mPreviewSurface != null) {
+					mPreviewSurface.release();
+					mPreviewSurface = null;
+				}
+				if (mTexId >= 0) {
+					GLHelper.deleteTex(mTexId);
+					mTexId = -1;
+				}
+				if (mEglSurface != null) {
+					mEglSurface.release();
+					mEglSurface = null;
+				}
+				if (mEgl != null) {
+					mEgl.release();
+					mEgl = null;
+				}
+			}
 		}
 	}
 
@@ -688,7 +689,8 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	 */
 	public void changeBrightYellow(){
 		String fsPath = "filter/bright_yellow_fg.sh";
-		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
+//		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
+		mRenderHandler.updateShader(new HueFilter(MyApplication.getAPP().getResources(), 60f));
 	}
 
 	/**
@@ -704,7 +706,8 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	 */
 	public void changeLightTea(){
 		String fsPath = "filter/light_tea_fg.sh";
-		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
+//		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
+		mRenderHandler.updateShader(new HueFilter(MyApplication.getAPP().getResources(), 34f));
 
 	}
 
@@ -713,7 +716,9 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	 */
 	public void changeDarkTea(){
 		String fsPath = "filter/dark_tea_fg.sh";
-		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
+//		mRenderHandler.updateShader(new BaseFuncFilter(MyApplication.getAPP().getResources(), fsPath));
+		mRenderHandler.updateShader(new HueFilter(MyApplication.getAPP().getResources(), 20f));
+
 	}
 
 	/**
@@ -762,5 +767,12 @@ public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	 */
 	public void changeColorYellowBorder(){
 		mRenderHandler.updateShader(new ColorBorderFilter(MyApplication.getAPP().getResources(), new float[]{1.0f, 1.0f, 0.0f, 1.0f}));
+	}
+
+	/**
+	 * 亮黄色调
+	 */
+	public void changeHueYellow(){
+		mRenderHandler.updateShader(new HueFilter(MyApplication.getAPP().getResources(), 60f));
 	}
 }
